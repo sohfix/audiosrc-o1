@@ -1,10 +1,15 @@
 #!/home/sohfix/PycharmProjects/rehab/renv/bin/python3
+
 import os
 import subprocess
 import argparse
 import sys
 import requests
 import feedparser
+from rich.console import Console
+from rich.progress import Progress, BarColumn, TextColumn
+
+console = Console()
 
 
 def ensure_output_dir(output_dir):
@@ -14,7 +19,7 @@ def ensure_output_dir(output_dir):
     try:
         os.makedirs(output_dir, exist_ok=True)
     except OSError as e:
-        print(f"Error: Unable to create output directory '{output_dir}'. {e}")
+        console.print(f"[red]Error:[/red] Unable to create output directory '{output_dir}'. {e}", style="bold red")
         sys.exit(1)
 
 
@@ -24,79 +29,104 @@ def install_dependencies(verbose=False):
     """
     requirements_file = os.path.join(os.path.dirname(__file__), "requirements.txt")
 
-    # Check if requirements.txt exists
     if not os.path.isfile(requirements_file):
-        print(f"Error: requirements.txt not found at {requirements_file}")
+        console.print(f"[red]Error:[/red] requirements.txt not found at {requirements_file}", style="bold red")
         sys.exit(1)
 
-    # Construct the pip command
     command = [sys.executable, "-m", "pip", "install", "-r", requirements_file]
-    if verbose:
-        print("Running in verbose mode...")
-    else:
+
+    if not verbose:
         command.append("--quiet")
 
-    # Run the pip command
+    console.print(f"[blue]Installing dependencies from {requirements_file}...[/blue]")
     try:
-        print(f"Installing dependencies from {requirements_file}...")
-        subprocess.run(command, check=True)
-        print("Dependencies installed successfully!")
+        with Progress(
+                TextColumn("[progress.description]{task.description}"),
+                BarColumn(),
+                TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+                console=console
+        ) as progress:
+            task = progress.add_task("Installing dependencies...", total=None)
+            subprocess.run(command, check=True)
+            progress.update(task, completed=100)
+
+        console.print("[green]Dependencies installed successfully![/green]")
     except subprocess.CalledProcessError as e:
-        print(f"Error: Failed to install dependencies. {e}")
+        console.print(f"[red]Error:[/red] Failed to install dependencies. {e}", style="bold red")
         sys.exit(1)
 
 
-def download_audio(url, output_file, debug=False):
+def download_audio(url, output_file, cookies_file=None, debug=False, verbose=False):
     """
     Download audio from a URL using yt-dlp and save it as an MP3 file.
-    Includes a --force flag to bypass restrictions.
     """
     command = [
         "yt-dlp",
-        "--force-generic-extractor",  # Use this to force the extractor
         "-x", "--audio-format", "mp3",
         "-o", output_file,
         url
     ]
+
+    if cookies_file:
+        command.extend(["--cookies", cookies_file])
+
     if debug:
-        print("Running command:", " ".join(command))
-    print(f"Downloading audio from: {url}")
+        console.print(f"[yellow][DEBUG][/yellow] Running command: {' '.join(command)}")
+
+    console.print(f"[blue]Downloading audio from:[/blue] {url}")
     try:
-        subprocess.run(command, check=True)
-        print(f"Download complete. Saved to: {output_file}")
+        with Progress(
+                TextColumn("[progress.description]{task.description}"),
+                BarColumn(),
+                TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+                console=console
+        ) as progress:
+            task = progress.add_task("Downloading...", total=None)
+            subprocess.run(command, check=True)
+            progress.update(task, completed=100)
+
+        console.print(f"[green]Download complete! Saved to:[/green] {output_file}")
     except FileNotFoundError:
-        print("Error: yt-dlp is not installed. Install it with 'pip install yt-dlp'.")
+        console.print("[red]Error:[/red] yt-dlp is not installed. Install it with 'pip install yt-dlp'.",
+                      style="bold red")
         sys.exit(1)
     except subprocess.CalledProcessError as e:
-        print(f"Error: Failed to download audio. {e}")
+        console.print(f"[red]Error:[/red] Failed to download audio. {e}", style="bold red")
         sys.exit(1)
 
 
-def get_title_from_url(url):
+def get_title_from_url(url, debug=False, verbose=False):
     """
-    Fetch the title of a YouTube video using yt-dlp.
+    Fetch the title of a YouTube video (or other supported site) using yt-dlp.
     """
-    command = [
-        "yt-dlp",
-        "--get-title",
-        url
-    ]
+    if verbose:
+        console.print(f"[blue]Retrieving title for URL:[/blue] {url}")
+
+    command = ["yt-dlp", "--get-title", url]
+
+    if debug:
+        console.print(f"[yellow][DEBUG][/yellow] Running command: {' '.join(command)}")
+
     try:
         result = subprocess.run(command, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         title = result.stdout.strip()
-        return "".join(c for c in title if c.isalnum() or c in " _-").rstrip()  # Sanitize the title
+        return "".join(c for c in title if c.isalnum() or c in " _-").rstrip()
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"Failed to retrieve title from URL. {e}")
 
 
-def download_from_file(file_path, base_output_dir, use_title=False, debug=False):
+def download_from_file(file_path, base_output_dir, use_title=False, cookies_file=None, debug=False, verbose=False):
     """
     Download multiple audio files from a text file containing section headers and URLs.
     Organizes downloads into subdirectories based on sections.
     """
     if not os.path.isfile(file_path):
-        print(f"Error: File '{file_path}' does not exist.")
+        console.print(f"[red]Error:[/red] File '{file_path}' does not exist.", style="bold red")
         sys.exit(1)
+
+    if verbose:
+        console.print(f"[blue]Starting bulk download from file:[/blue] {file_path}")
+        console.print(f"[blue]Base output directory:[/blue] {base_output_dir}")
 
     try:
         current_section = None
@@ -104,134 +134,233 @@ def download_from_file(file_path, base_output_dir, use_title=False, debug=False)
         with open(file_path, 'r') as file:
             for line in file:
                 line = line.strip()
-
-                # Skip empty lines
                 if not line:
                     continue
 
-                # Detect section headers (e.g., [songs], [mixes])
                 if line.startswith("[") and line.endswith("]"):
-                    current_section = line[1:-1]  # Extract section name
+                    current_section = line[1:-1]
+                    if verbose:
+                        console.print(f"[yellow]Detected new section:[/yellow] {current_section}")
                     continue
 
-                # Ensure we are inside a valid section
                 if not current_section:
-                    print(f"Error: Found URL without a section: {line}")
+                    console.print(f"[red]Error:[/red] Found URL without a section: {line}", style="bold red")
                     continue
 
-                # Determine subdirectory for the current section
                 section_dir = os.path.join(base_output_dir, current_section)
                 ensure_output_dir(section_dir)
 
                 if not use_title:
-                    # Parse filename and URL
                     try:
                         file_name, url = line.split('" "')
                         file_name = file_name.strip('"')
                         url = url.strip('"')
                     except ValueError:
-                        print(f"Error: Invalid format in line: {line}. Expected format: \"filename.mp3\" \"url\"")
+                        console.print(
+                            f"[red]Error:[/red] Invalid format in line: {line}. Expected format: \"filename.mp3\" \"url\"",
+                            style="bold red")
                         continue
                 else:
-                    # Use the title from the URL
                     url = line.strip('"')
                     try:
-                        file_name = get_title_from_url(url) + ".mp3"
+                        file_name = get_title_from_url(url, debug=debug, verbose=verbose) + ".mp3"
                     except Exception as e:
-                        print(f"Error: Unable to retrieve title from URL '{url}': {e}")
+                        console.print(f"[red]Error:[/red] Unable to retrieve title from URL '{url}': {e}",
+                                      style="bold red")
                         continue
 
-                # Full output file path
                 output_file = os.path.join(section_dir, file_name)
 
-                # Download the audio
-                print(f"Downloading: {file_name} from {url} into {section_dir}")
-                download_audio(url, output_file, debug=debug)
+                if verbose:
+                    console.print(f"[blue]Downloading file:[/blue] {file_name}")
+                    console.print(f"[blue]  from URL:[/blue] {url}")
+                    console.print(f"[blue]  into directory:[/blue] {section_dir}")
+
+                download_audio(url, output_file, cookies_file=cookies_file, debug=debug, verbose=verbose)
 
     except Exception as e:
-        print(f"Error: Unable to process file '{file_path}'. {e}")
+        console.print(f"[red]Error:[/red] Unable to process file '{file_path}'. {e}", style="bold red")
         sys.exit(1)
 
 
-def download_podcast_rss(rss_url, output_dir):
+def download_podcast_rss(rss_url, output_dir, debug=False, verbose=False):
     """
     Download all episodes from a podcast RSS feed.
     """
-    ensure_output_dir(output_dir)
+    if verbose:
+        console.print(f"[blue]Fetching RSS feed from:[/blue] {rss_url}")
+        console.print(f"[blue]Output directory:[/blue] {output_dir}")
 
-    print(f"Fetching RSS feed from: {rss_url}")
+    ensure_output_dir(output_dir)
     feed = feedparser.parse(rss_url)
 
     if not feed.entries:
-        print(f"No episodes found in RSS feed: {rss_url}")
+        console.print(f"[yellow]No episodes found in RSS feed:[/yellow] {rss_url}")
         return
 
-    # Loop through episodes
     for entry in feed.entries:
         title = entry.title
         link = entry.enclosures[0].href if entry.enclosures else None
 
         if not link:
-            print(f"Skipping episode '{title}' (no downloadable link found).")
+            console.print(f"[yellow]Skipping episode '{title}' (no downloadable link found).[/yellow]")
             continue
 
-        # Sanitize title for filename
         sanitized_title = "".join(c for c in title if c.isalnum() or c in " _-").rstrip()
         file_path = os.path.join(output_dir, f"{sanitized_title}.mp3")
 
-        # Download the episode
-        print(f"Downloading: {title}")
+        if verbose:
+            console.print(f"[blue]Downloading podcast episode:[/blue] {title}")
+            console.print(f"[blue]  Episode link:[/blue] {link}")
+            console.print(f"[blue]  Saving to:[/blue] {file_path}")
+
         try:
-            response = requests.get(link, stream=True)
-            response.raise_for_status()
-            with open(file_path, "wb") as f:
-                for chunk in response.iter_content(chunk_size=8192):
-                    f.write(chunk)
-            print(f"Saved: {file_path}")
+            with Progress(
+                    TextColumn("[progress.description]{task.description}"),
+                    BarColumn(),
+                    TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+                    console=console
+            ) as progress:
+                task = progress.add_task("Downloading...", total=None)
+                response = requests.get(link, stream=True)
+                response.raise_for_status()
+                with open(file_path, "wb") as f:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        f.write(chunk)
+                    progress.update(task, completed=100)
+            console.print(f"[green]Saved:[/green] {file_path}")
         except requests.RequestException as e:
-            print(f"Error downloading episode '{title}': {e}")
+            console.print(f"[red]Error downloading episode '{title}':[/red] {e}", style="bold red")
+
+
+def record_audio(output_file, device="default", debug=False, verbose=False, duration=None, bitrate="128k",
+                 sample_rate="44100"):
+    """
+    Record audio from the specified system input device using FFmpeg.
+    Press Ctrl+C or terminate the process to stop recording.
+    """
+    ffmpeg_input = ["-f", "alsa", "-i", device]
+
+    if verbose:
+        console.print("[blue]Starting audio recording with the following parameters:[/blue]")
+        console.print(f"  [blue]Output file:[/blue] {output_file}")
+        console.print(f"  [blue]Device:[/blue] {device}")
+        console.print(f"  [blue]Duration:[/blue] {duration if duration else 'unlimited (until stopped)'}")
+        console.print(f"  [blue]Bitrate:[/blue] {bitrate}")
+        console.print(f"  [blue]Sample rate:[/blue] {sample_rate}")
+        console.print("[blue]Press Ctrl+C to stop the recording whenever you're done.[/blue]")
+
+    command = [
+                  "ffmpeg",
+                  "-y",
+              ] + ffmpeg_input + [
+                  "-vn",
+                  "-acodec", "libmp3lame",
+                  "-ab", bitrate,
+                  "-ar", sample_rate,
+              ]
+
+    if duration is not None:
+        command.extend(["-t", str(duration)])
+
+    command.append(output_file)
+
+    if debug:
+        console.print(f"[yellow][DEBUG][/yellow] FFmpeg command: {' '.join(command)}")
+
+    try:
+        subprocess.run(command, check=True)
+    except FileNotFoundError:
+        console.print("[red]Error:[/red] ffmpeg not found. Please install ffmpeg and try again.", style="bold red")
+        sys.exit(1)
+    except subprocess.CalledProcessError as e:
+        console.print(f"[red]Error:[/red] ffmpeg failed to record audio. {e}", style="bold red")
+        sys.exit(1)
+    except KeyboardInterrupt:
+        console.print("\n[blue]Recording stopped by user.[/blue]")
+        sys.exit(0)
+
+
+def show_manual():
+    """
+    Print a detailed, mini-manual of all commands and arguments for the user.
+    """
+    manual_text = r"""
+===========================
+ REHAB: MINI-MANUAL
+===========================
+This script can INSTALL dependencies, DOWNLOAD audio, RECORD from a system input,
+and also display this MANUAL. Below is a summary of each command and its arguments.
+...
+"""
+    console.print(manual_text)
 
 
 def main():
-    """
-    Main function to parse arguments and execute commands.
-    """
-    parser = argparse.ArgumentParser(description="Rehab: Audio Recorder, Splitter, and Downloader")
+    parser = argparse.ArgumentParser(description="Rehab: Audio Recorder, Splitter, and Downloader", add_help=True)
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    # Install command
+    # Install Command
     install_parser = subparsers.add_parser("install", help="Install dependencies from requirements.txt")
-    install_parser.add_argument("--verbose", action="store_true", help="Show detailed installation logs")
+    install_parser.add_argument("--verbose", action="store_true", help="Show detailed installation logs.")
 
-    # Download command
-    download_parser = subparsers.add_parser("download", help="Download audio as MP3 from a URL, text file, or RSS feed")
-    download_parser.add_argument("url", nargs="?", help="URL of the audio to download")
+    # Download Command
+    download_parser = subparsers.add_parser("download",
+                                            help="Download audio as MP3 from a URL, text file, or RSS feed.")
+    download_parser.add_argument("url", nargs="?", help="URL of the audio/video to download (e.g. YouTube link).")
     download_parser.add_argument("-o", "--output", default="./downloads/audio.mp3",
-                                 help="Output file path for single download (default: ./downloads/audio.mp3)")
-    download_parser.add_argument("-f", "--file", help="Text file with filename and URL pairs for bulk download")
+                                 help="Output file path for a single download.")
+    download_parser.add_argument("-f", "--file",
+                                 help="Text file with filename and URL pairs, possibly in section headers.")
     download_parser.add_argument("-d", "--dir", default="./downloads",
-                                 help="Base output directory for bulk downloads (default: ./downloads)")
-    download_parser.add_argument("--rss", help="RSS feed URL for downloading podcast episodes")
+                                 help="Base output directory for multiple downloads.")
+    download_parser.add_argument("--rss",
+                                 help="Download audio files from a podcast RSS feed (e.g., https://site/feed.xml).")
     download_parser.add_argument("--use-title", action="store_true",
-                                 help="Use video titles for filenames when downloading from file")
-    download_parser.add_argument("--debug", action="store_true", help="Show detailed download commands for debugging")
+                                 help="Use the content's title (via yt-dlp) as the filename.")
+    download_parser.add_argument("--cookies", help="Path to cookies file for authenticated downloads.")
+    download_parser.add_argument("--debug", action="store_true", help="Show the yt-dlp command used for debugging.")
+    download_parser.add_argument("--verbose", action="store_true",
+                                 help="Show additional messages explaining each step.")
+
+    # Record Command
+    rec_parser = subparsers.add_parser("rec", help="Record audio from a system input device and save as MP3.")
+    rec_parser.add_argument("--name", required=True, help="Base filename (without the .mp3 extension).")
+    rec_parser.add_argument("-o", "--output-dir", default="./recordings", help="Directory to save the MP3 file.")
+    rec_parser.add_argument("--device", default="default", help="Audio input device name.")
+    rec_parser.add_argument("--duration", type=int, help="Maximum number of seconds to record (omit for unlimited).")
+    rec_parser.add_argument("--bitrate", default="128k", help="MP3 encoding bitrate.")
+    rec_parser.add_argument("--sample-rate", default="44100", help="MP3 sample rate in Hz.")
+    rec_parser.add_argument("--debug", action="store_true", help="Display the ffmpeg command for debugging.")
+    rec_parser.add_argument("--verbose", action="store_true", help="Print detailed messages during recording.")
+
+    # Manual Command
+    manual_parser = subparsers.add_parser("manual", help="Display a mini-manual with extended usage instructions.")
 
     args = parser.parse_args()
 
-    # Execute the selected command
     if args.command == "install":
         install_dependencies(verbose=args.verbose)
     elif args.command == "download":
         if args.rss:
-            download_podcast_rss(args.rss, args.dir)
+            download_podcast_rss(args.rss, args.dir, debug=args.debug, verbose=args.verbose)
         elif args.file:
-            download_from_file(args.file, args.dir, args.use_title, debug=args.debug)
+            download_from_file(args.file, args.dir, use_title=args.use_title, cookies_file=args.cookies,
+                               debug=args.debug, verbose=args.verbose)
         elif args.url:
             ensure_output_dir(os.path.dirname(args.output))
-            download_audio(args.url, args.output, debug=args.debug)
+            download_audio(args.url, args.output, cookies_file=args.cookies, debug=args.debug, verbose=args.verbose)
         else:
-            print("Error: You must specify a URL, file, or RSS feed for the download.")
+            console.print("[red]Error:[/red] You must specify a URL, file, or RSS feed for the download.",
+                          style="bold red")
             sys.exit(1)
+    elif args.command == "rec":
+        ensure_output_dir(args.output_dir)
+        output_file = os.path.join(args.output_dir, f"{args.name}.mp3")
+        record_audio(output_file, device=args.device, debug=args.debug, verbose=args.verbose, duration=args.duration,
+                     bitrate=args.bitrate, sample_rate=args.sample_rate)
+    elif args.command == "manual":
+        show_manual()
 
 
 if __name__ == "__main__":
