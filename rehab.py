@@ -60,19 +60,22 @@ def download_podcast_rss(rss_url, output_dir, count=None, searchby=None, debug=F
             console.print(f"[blue]  Saving to:[/blue] {file_path}")
 
         try:
-            with Progress(
-                TextColumn("[progress.description]{task.description}"),
-                BarColumn(),
-                TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-                console=console
-            ) as progress:
-                task = progress.add_task("Downloading...", total=None)
-                response = requests.get(link, stream=True)
+            with requests.get(link, stream=True) as response:
                 response.raise_for_status()
-                with open(file_path, "wb") as f:
-                    for chunk in response.iter_content(chunk_size=8192):
-                        f.write(chunk)
-                    progress.update(task, completed=100)
+                total_size = int(response.headers.get("content-length", 0))
+
+                with Progress(
+                    TextColumn("[progress.description]{task.description}"),
+                    BarColumn(),
+                    TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+                    console=console
+                ) as progress:
+                    task = progress.add_task("Downloading...", total=total_size)
+                    with open(file_path, "wb") as f:
+                        for chunk in response.iter_content(chunk_size=8192):
+                            f.write(chunk)
+                            progress.update(task, advance=len(chunk))
+
             console.print(f"[green]Saved:[/green] {file_path}")
         except requests.RequestException as e:
             console.print(f"[red]Error downloading episode '{title}':[/red] {e}", style="bold red")
