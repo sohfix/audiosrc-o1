@@ -40,3 +40,11 @@ renv\Scripts\activate     # For Windows
 
 # Install dependencies
 python3 rehab.py install
+
+rehab/
+│
+├── rehab.py          # Main CLI program
+├── requirements.txt  # Python dependencies
+├── README.md         # Documentation (this file)
+├── recordings/       # Directory for audio recordings (created on runtime)
+└── downloads/        # Directory for downloaded audio (created on runtime)
