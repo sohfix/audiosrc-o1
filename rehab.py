@@ -6,7 +6,7 @@ import sys
 import requests
 import feedparser
 from rich.console import Console
-from rich.progress import Progress, BarColumn, TextColumn
+from rich.progress import Progress, BarColumn, TextColumn, TimeElapsedColumn
 from pytube import YouTube
 import subprocess
 import logging
@@ -15,6 +15,9 @@ import platform
 import configparser
 
 console = Console()
+
+# Version variable
+VERSION = "1.0.0"
 
 
 def ensure_output_dir(output_dir):
@@ -129,32 +132,62 @@ def get_password_from_config():
         sys.exit(1)
 
 
+def download_with_progress(url, output_path, description="Downloading"):
+    """Download a file with a progress bar."""
+    response = requests.get(url, stream=True)
+    total_size = int(response.headers.get('content-length', 0))
+
+    with open(output_path, 'wb') as file, Progress(
+        TextColumn("[bold blue]{task.description}[/bold blue]"),
+        BarColumn(),
+        TextColumn("{task.completed}/{task.total} bytes"),
+        TimeElapsedColumn(),
+    ) as progress:
+        task = progress.add_task(description, total=total_size)
+
+        for chunk in response.iter_content(chunk_size=1024):
+            file.write(chunk)
+            progress.update(task, advance=len(chunk))
+
+
 def setup_dependencies(os_type, verbose=False):
     """Install dependencies based on the operating system."""
     dependencies_installed = False
 
     try:
-        if os_type == "linux":
-            if verbose:
-                console.print("[blue]Installing dependencies for Linux...[/blue]")
-            subprocess.run(["sudo", "apt-get", "update"], check=True)
-            subprocess.run(["sudo", "apt-get", "install", "-y", "python3-pip", "ffmpeg"], check=True)
-            dependencies_installed = True
+        with Progress(
+            TextColumn("[bold blue]{task.description}[/bold blue]"),
+            BarColumn(),
+            TextColumn("{task.percentage:>3.0f}%"),
+            TimeElapsedColumn(),
+        ) as progress:
+            task = progress.add_task("Setting up dependencies...", total=3)
 
-        elif os_type == "windows":
-            if verbose:
-                console.print("[blue]Installing dependencies for Windows...[/blue]")
-            subprocess.run(["choco", "install", "ffmpeg", "-y"], check=True)
-            dependencies_installed = True
+            if os_type == "linux":
+                if verbose:
+                    console.print("[blue]Installing dependencies for Linux...[/blue]")
+                subprocess.run(["sudo", "apt-get", "update"], check=True)
+                progress.update(task, advance=1)
+                subprocess.run(["sudo", "apt-get", "install", "-y", "python3-pip", "ffmpeg"], check=True)
+                progress.update(task, advance=1)
+                dependencies_installed = True
 
-        else:
-            console.print("[red]Unsupported OS type provided.[/red]", style="bold red")
-            return False
+            elif os_type == "windows":
+                if verbose:
+                    console.print("[blue]Installing dependencies for Windows...[/blue]")
+                subprocess.run(["choco", "install", "ffmpeg", "-y"], check=True)
+                progress.update(task, advance=1)
+                dependencies_installed = True
 
-        if dependencies_installed:
-            console.print("[green]Running 'sudo apt autoremove'.[/green]", style="bold green")
-            password = get_password_from_config()
-            subprocess.run(["sudo", "-S", "apt", "autoremove"], input=f"{password}\n", text=True, check=True)
+            else:
+                console.print("[red]Unsupported OS type provided.[/red]", style="bold red")
+                return False
+
+            if dependencies_installed:
+                console.print("[green]Running 'sudo apt autoremove'.[/green]", style="bold green")
+                password = get_password_from_config()
+                subprocess.run(["sudo", "-S", "apt", "autoremove"], input=f"{password}\n", text=True, check=True)
+                progress.update(task, advance=1)
 
     except subprocess.CalledProcessError as e:
         console.print(f"[red]Error during installation:[/red] {e}", style="bold red")
@@ -175,14 +208,7 @@ def main():
                                  help="Base output directory for downloads.")
     download_parser.add_argument("--rss",
                                  help="Download audio files from a podcast RSS feed (e.g., https://site/feed.xml).")
-    download_parser.add_argument("--count", type=int, help="Number of most recent episodes to download.")
-    download_parser.add_argument("--search-by", help="String to search for in podcast titles.")
     download_parser.add_argument("--youtube", help="Download content from a YouTube URL.")
-    download_parser.add_argument("--audio-only", action="store_true", help="Download only audio as MP3.")
-    download_parser.add_argument("--use-title", action="store_true", help="Use the YouTube video's title.")
-    download_parser.add_argument("--set-title", help="Set a custom title for the downloaded YouTube content.")
-    download_parser.add_argument("--yt-dlp", action="store_true",
-                                 help="Use yt-dlp instead of pytube for downloading YouTube content.")
     download_parser.add_argument("--log-session", action="store_true", help="Log the session in '$HOME/pylogs/rehab'.")
     download_parser.add_argument("--verbose", action="store_true",
                                  help="Show additional messages explaining each step.")
@@ -191,8 +217,6 @@ def main():
     setup_parser = subparsers.add_parser("setup", help="Installs dependencies for rehab.")
     setup_parser.add_argument("--linux", action="store_true", help="Install dependencies for Linux.")
     setup_parser.add_argument("--windows", action="store_true", help="Install dependencies for Windows.")
-    setup_parser.add_argument("--ini", action="store_true",
-                              help="Walkthrough to edit or validate the settings.ini file.")
     setup_parser.add_argument("--verbose", action="store_true", help="Show additional messages explaining each step.")
     setup_parser.add_argument("--log-session", action="store_true", help="Log the session in '$HOME/pylogs/rehab'.")
 
@@ -202,11 +226,6 @@ def main():
     log_file = setup_logging(args.log_session)
 
     if args.command == "setup":
-        if args.ini:
-            config_path = setup_config()
-            validate_and_edit_config(config_path)
-            console.print("[green]INI file setup and validated successfully![/green]", style="bold green")
-
         if args.linux:
             success = setup_dependencies("linux", verbose=args.verbose)
         elif args.windows:
