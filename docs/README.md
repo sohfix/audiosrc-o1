@@ -1,50 +1,161 @@
-# rehab
-#### 0.0.11a Version
-
-@author sohfix
-
 # Rehab: Audio Recorder, Splitter, and Downloader
 
-**Rehab** is a powerful command-line tool that helps you **download audio**, **record system input**, and **manage audio files** efficiently. It supports various sources like YouTube, RSS feeds, and more. This project leverages the power of `yt-dlp`, `ffmpeg`, and Python libraries to streamline your audio processing needs.
+### Version: 0.0.11a
+
+**Author:** Sohfix
+
+---
+
+## Overview
+
+**Rehab** is a powerful command-line tool that simplifies the process of downloading, recording, and managing audio files. Designed for efficiency, it supports various sources like YouTube, RSS feeds, and system audio input. Rehab combines Python libraries, `ffmpeg`, and `yt-dlp` to streamline your audio workflows with an intuitive interface.
+
+---
 
 ## Features
 
-- **Download audio** from YouTube, text files, or podcast RSS feeds.
-- **Record audio** from system input using `ffmpeg`.
-- **Automatic sectioning** when downloading multiple files from text input.
-- **Progress bars** and rich console formatting for an intuitive user experience.
-- **Comprehensive mini-manual** for quick help and command usage.
+- **Audio Downloading**:
+  - Download audio files from YouTube, RSS feeds, or provided text files.
+  - Convert YouTube videos into MP3 or MP4 formats with optional audio-only mode.
+- **System Audio Recording**:
+  - Record audio from system input using `ffmpeg` with customizable options.
+- **Enhanced User Experience**:
+  - Progress bars and rich formatting with the `rich` library.
+  - Comprehensive error handling and logging for debugging.
+- **Setup Automation**:
+  - Auto-configure dependencies using the `setup` command.
+  - INI file walkthrough for user customization.
+- **Cross-Platform Compatibility**:
+  - Designed to work on Linux, macOS, and Windows systems.
 
 ---
 
 ## Installation
 
 ### Prerequisites
-Ensure you have the following installed:
-- Python 3.8+ (including `pip`)
-- `ffmpeg` (for audio recording)
-- `yt-dlp` (for audio downloading)
+
+Ensure the following are installed:
+- **Python**: Version 3.8 or higher.
+- **ffmpeg**: Required for audio recording.
+- **yt-dlp**: For downloading YouTube videos and audio.
+- **pytube**: Alternative plugin for YouTube downloads.
 
 ### Steps
+
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/rehab.git
+   git clone https://github.com/sohfix/rehab.git
    cd rehab
+   ```
 
-# Create a virtual environment
-python3 -m venv renv
+2. Create a virtual environment:
+   ```bash
+   python3 -m venv renv
+   ```
 
-# Activate the environment
-source renv/bin/activate  # For Linux/macOS
-renv\Scripts\activate     # For Windows
+3. Activate the virtual environment:
+   - **Linux/macOS**:
+     ```bash
+     source renv/bin/activate
+     ```
+   - **Windows**:
+     ```bash
+     renv\Scripts\activate
+     ```
 
-# Install dependencies
-python3 rehab.py install
+4. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
+5. Run the setup:
+   ```bash
+   python3 rehab.py setup --linux
+   ```
+   Replace `--linux` with `--windows` if you're on a Windows system.
+
+---
+
+## Usage
+
+Rehab offers a variety of commands to suit your needs. Below is an overview of the available functionality.
+
+### General Structure
+
+```bash
+python3 rehab.py <command> [options]
+```
+
+### Commands
+
+#### `setup`
+Automate the installation of dependencies and configuration.
+
+- Example:
+  ```bash
+  python3 rehab.py setup --linux --ini
+  ```
+  - `--linux`: Installs dependencies for Linux.
+  - `--ini`: Walks through and validates the `settings.ini` configuration.
+
+#### `download`
+Download audio files from YouTube, RSS feeds, or provided URLs.
+
+- Options:
+  - `--youtube`: Provide a YouTube URL to download audio.
+  - `--rss`: Specify a podcast RSS feed URL to fetch episodes.
+  - `--count`: Limit the number of episodes downloaded from an RSS feed.
+  - `--audio-only`: Download only the audio in MP3 format.
+  - `--set-title`: Set a custom title for the downloaded content.
+
+- Example:
+  ```bash
+  python3 rehab.py download --youtube "https://youtu.be/dQw4w9WgXcQ" --audio-only
+  ```
+
+#### `record`
+Record system audio input.
+
+- Options:
+  - `--duration`: Set the duration of the recording (in seconds).
+  - `--output`: Specify the output file name.
+
+- Example:
+  ```bash
+  python3 rehab.py record --duration 60 --output recording.mp3
+  ```
+
+---
+
+## Directory Structure
+
+```plaintext
 rehab/
 │
 ├── rehab.py          # Main CLI program
 ├── requirements.txt  # Python dependencies
 ├── README.md         # Documentation (this file)
-├── recordings/       # Directory for audio recordings (created on runtime)
-└── downloads/        # Directory for downloaded audio (created on runtime)
+├── pylogs/           # Logs for troubleshooting
+├── rehab-settings/   # Configuration files
+└── renv/             # Virtual environment
+```
+
+---
+
+## Contributing
+
+Contributions are welcome! Feel free to submit issues or pull requests on the [GitHub repository](https://github.com/sohfix/rehab).
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+---
+
+## Contact
+
+For any inquiries or feedback, reach out to the author:
+- **Email**: [nicolas.tech808@gmail.com](mailto:nicolas.tech808@gmail.com)
+- **GitHub**: [github.com/sohfix](https://github.com/sohfix)
