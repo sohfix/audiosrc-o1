@@ -1,8 +1,6 @@
 # Rehab: Audio Recorder, Splitter, and Downloader
 
-### Version: 0.0.11a
-
-**Author:** Sohfix
+### Version: 1.0.3 @author:** Sohfix
 
 ---
 
@@ -23,7 +21,7 @@
   - Progress bars and rich formatting with the `rich` library.
   - Comprehensive error handling and logging for debugging.
 - **Setup Automation**:
-  - Auto-configure dependencies using the `setup` command.
+  - Autoconfigure dependencies using the `setup` command.
   - INI file walkthrough for user customization.
 - **Cross-Platform Compatibility**:
   - Designed to work on Linux, macOS, and Windows systems.
