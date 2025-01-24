@@ -1,30 +1,47 @@
 # Rehab: Audio Recorder, Splitter, and Downloader
 
-### Version: 1.0.3 @author:** Sohfix
+![Version](https://img.shields.io/badge/version-1.0.3-green)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
+A powerful command-line tool to download and manage audio files. **Rehab** supports YouTube videos, podcast RSS feeds. Backed by Python, `ffmpeg`, and `yt-dlp`, Rehab streamlines your audio workflow with an intuitive interface.
 
 ---
 
-## Overview
-
-**Rehab** is a powerful command-line tool that simplifies the process of downloading, recording, and managing audio files. Designed for efficiency, it supports various sources like YouTube, RSS feeds, and system audio input. Rehab combines Python libraries, `ffmpeg`, and `yt-dlp` to streamline your audio workflows with an intuitive interface.
+## Table of Contents
+- [Features](#features)
+- [Installation](#installation)
+  - [Prerequisites](#prerequisites)
+  - [Steps](#steps)
+- [Usage](#usage)
+  - [General Structure](#general-structure)
+  - [Commands](#commands)
+    - [setup](#setup)
+    - [download](#download)
+- [Directory Structure](#directory-structure)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
 
 ---
 
 ## Features
 
-- **Audio Downloading**:
-  - Download audio files from YouTube, RSS feeds, or provided text files.
-  - Convert YouTube videos into MP3 or MP4 formats with optional audio-only mode.
-- **System Audio Recording**:
-  - Record audio from system input using `ffmpeg` with customizable options.
-- **Enhanced User Experience**:
-  - Progress bars and rich formatting with the `rich` library.
-  - Comprehensive error handling and logging for debugging.
-- **Setup Automation**:
-  - Autoconfigure dependencies using the `setup` command.
-  - INI file walkthrough for user customization.
-- **Cross-Platform Compatibility**:
-  - Designed to work on Linux, macOS, and Windows systems.
+- **Audio Downloading**  
+  Download audio files from YouTube, RSS feeds, or direct URLs. Convert videos into MP3 or MP4 with audio-only mode.
+
+- **System Audio Recording**  
+  Record system audio input using `ffmpeg` with customizable duration and output.
+
+- **Enhanced User Experience**  
+  - Progress bars and color-rich output using the `rich` library  
+  - Comprehensive error handling and logging
+
+- **Setup Automation**  
+  - `setup` command to auto-configure dependencies  
+  - Interactive INI file configuration
+
+- **Cross-Platform Compatibility**  
+  Works on Linux, macOS, and Windows.
 
 ---
 

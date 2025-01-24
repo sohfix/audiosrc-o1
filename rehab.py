@@ -78,17 +78,23 @@ def validate_and_edit_config(config_path):
 
     changed = False
 
-    if 'user' not in config or 'password' not in config['user'] or not config['user']['password']:
+    # Ensure config has the necessary sections/keys
+    if 'user' not in config:
+        config['user'] = {}
+    if 'system' not in config:
+        config['system'] = {}
+
+    if 'password' not in config['user'] or not config['user']['password']:
         console.print("[yellow]Password is missing in settings.ini. Let's fix it.[/yellow]", style="bold yellow")
         config['user']['password'] = console.input("[blue]Enter your password: [/blue]")
         changed = True
 
-    if 'user' not in config or 'name' not in config['user'] or not config['user']['name']:
+    if 'name' not in config['user'] or not config['user']['name']:
         console.print("[yellow]Name is missing in settings.ini. Let's fix it.[/yellow]", style="bold yellow")
         config['user']['name'] = console.input("[blue]Enter your name: [/blue]")
         changed = True
 
-    if 'system' not in config or 'os' not in config['system'] or not config['system']['os']:
+    if 'os' not in config['system'] or not config['system']['os']:
         console.print("[yellow]OS is missing in settings.ini. Let's fix it.[/yellow]", style="bold yellow")
         config['system']['os'] = console.input("[blue]Enter your operating system (linux/windows): [/blue]")
         changed = True
@@ -124,6 +130,34 @@ def get_password_from_config():
     except KeyError as e:
         console.print(f"[red]Error in settings.ini:[/red] {e}", style="bold red")
         sys.exit(1)
+
+def install_dependencies_linux(verbose):
+    """Install required dependencies for Linux systems."""
+    dependencies = ["ffmpeg", "yt-dlp"]
+    command = ["sudo", "apt-get", "install", "-y"] + dependencies
+
+    if verbose:
+        console.print(f"[blue]Installing dependencies: {dependencies}[/blue]")
+        command.append("--verbose")
+
+    try:
+        subprocess.run(command, check=True)
+        console.print("[green]Linux dependencies installed successfully![/green]")
+    except subprocess.CalledProcessError as e:
+        console.print(f"[red]Error installing dependencies:[/red] {e}", style="bold red")
+
+def install_dependencies_windows(verbose):
+    """Install required dependencies for Windows systems."""
+    dependencies = ["ffmpeg", "yt-dlp"]
+
+    try:
+        for dependency in dependencies:
+            if verbose:
+                console.print(f"[blue]Installing dependency: {dependency}[/blue]")
+            subprocess.run(["choco", "install", dependency, "-y"], check=True)
+        console.print("[green]Windows dependencies installed successfully![/green]")
+    except subprocess.CalledProcessError as e:
+        console.print(f"[red]Error installing dependencies:[/red] {e}", style="bold red")
 
 def download_with_progress(url, output_path, description="Downloading"):
     """Download a file with a progress bar."""
@@ -193,7 +227,11 @@ def download_youtube_content(url, output_dir, audio_only=False, use_title=False,
     ensure_output_dir(output_dir)
 
     if yt_dlp:
-        output_template = os.path.join(output_dir, "%(title)s.%(ext)s") if use_title else os.path.join(output_dir, f"{set_title or 'Untitled'}.%(ext)s")
+        output_template = (
+            os.path.join(output_dir, "%(title)s.%(ext)s")
+            if use_title
+            else os.path.join(output_dir, f"{set_title or 'Untitled'}.%(ext)s")
+        )
         format_option = "bestaudio" if audio_only else "bestvideo+bestaudio"
 
         try:
@@ -253,7 +291,7 @@ def download_youtube_content(url, output_dir, audio_only=False, use_title=False,
             console.print(f"[red]Error downloading YouTube content:[/red] {e}", style="bold red")
 
 def manage_settings_config():
-    """Provide the ability to create, edit, or use the settings.ini file."""
+    """Provide the ability to create, edit, or view the settings.ini file."""
     config_path = setup_config()
 
     console.print("[blue]Settings management selected.[/blue]", style="bold blue")
@@ -266,6 +304,37 @@ def manage_settings_config():
         validate_and_edit_config(config_path)
     else:
         console.print("[red]Invalid action. Please choose 'view' or 'edit'.[/red]", style="bold red")
+
+def handle_setup_command(args):
+    """
+    Handle the 'setup' command logic:
+    - If --config is passed, go to config management.
+    - Else if --linux is passed, install linux dependencies.
+    - Else if --windows is passed, install windows dependencies.
+    - If neither is specified, try auto-detecting the OS.
+    """
+    if args.config:
+        manage_settings_config()
+        return
+
+    # If the user explicitly specifies one:
+    if args.linux:
+        install_dependencies_linux(verbose=args.verbose)
+        return
+    if args.windows:
+        install_dependencies_windows(verbose=args.verbose)
+        return
+
+    # Otherwise, do auto-detection.
+    current_os = platform.system().lower()
+    console.print(f"[yellow]No OS option provided. Auto-detecting OS: {current_os}[/yellow]", style="bold yellow")
+
+    if "linux" in current_os:
+        install_dependencies_linux(verbose=args.verbose)
+    elif "windows" in current_os:
+        install_dependencies_windows(verbose=args.verbose)
+    else:
+        console.print("[red]OS detection failed or unsupported OS. Please specify --linux or --windows.[/red]", style="bold red")
 
 def main():
     parser = argparse.ArgumentParser(description="Rehab: download audio", add_help=True)
@@ -294,41 +363,22 @@ def main():
     setup_parser = subparsers.add_parser("setup", help="Installs dependencies for rehab.")
     setup_parser.add_argument("--linux", action="store_true", help="Install dependencies for Linux.")
     setup_parser.add_argument("--windows", action="store_true", help="Install dependencies for Windows.")
-    setup_parser.add_argument("--verbose", action="store_true", help="Show additional messages explaining each step.")
-    setup_parser.add_argument("--log-session", action="store_true", help="Log the session in '$HOME/pylogs/rehab'.")
     setup_parser.add_argument("--config", action="store_true", help="Create, edit, or view the settings.ini file.")
+    setup_parser.add_argument("--verbose", action="store_true", help="Show additional messages explaining each step.")
 
     args = parser.parse_args()
 
-    # Check version flag
-    if getattr(args, "version", False):
-        console.print(f"[blue]Rehab Version:[/blue] {VERSION}")
-        sys.exit(0)
-
-    # Set up logging if requested
-    log_file = setup_logging(args.log_session)
-
-    success = None  # Initialize success variable
-
     if args.command == "setup":
-        if args.config:
-            manage_settings_config()
-        elif args.linux:
-            success = setup_dependencies("linux", verbose=args.verbose)
-        elif args.windows:
-            success = setup_dependencies("windows", verbose=args.verbose)
-        else:
-            console.print("[yellow]Please specify an OS using --linux or --windows.[/yellow]", style="bold yellow")
-            sys.exit(1)
+        handle_setup_command(args)
 
-        if success is not None and success:
-            console.print("[green]All dependencies are set up and ready to go![green]", style="bold green")
-            log_message("Setup complete.")
-        elif success is not None:
-            console.print("[red]Setup encountered errors. Check the logs for more details.[/red]", style="bold red")
-            log_message("Setup encountered errors.")
+    elif args.command == "download":
+        if args.log_session:
+            setup_logging(args.log_session)
 
-    if args.command == "download":
+        if args.version:
+            console.print(f"[green]Version: {VERSION}[/green]")
+            sys.exit(0)
+
         if args.rss:
             download_podcast_rss(
                 rss_url=args.rss,
