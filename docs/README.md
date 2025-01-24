@@ -1,22 +1,21 @@
-# Rehab: Audio Recorder, Splitter, and Downloader
+# CLI Tools Suite: Rehab, Retex, and Twain
 
-![Version](https://img.shields.io/badge/version-1.0.3-green)
+![Version](https://img.shields.io/badge/version-1.0.0-green)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-A powerful command-line tool to download and manage audio files. **Rehab** supports YouTube videos, podcast RSS feeds. Backed by Python, `ffmpeg`, and `yt-dlp`, Rehab streamlines your audio workflow with an intuitive interface.
+A suite of powerful command-line tools designed for audio processing, LaTeX compilation, and interactive library/journal management. This suite streamlines various workflows with rich visuals, robust features, and seamless integration.
 
 ---
 
 ## Table of Contents
-- [Features](#features)
+- [Tools Overview](#tools-overview)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
-  - [Steps](#steps)
+  - [Setup](#setup)
 - [Usage](#usage)
-  - [General Structure](#general-structure)
-  - [Commands](#commands)
-    - [setup](#setup)
-    - [download](#download)
+  - [Rehab](#rehab)
+  - [Retex](#retex)
+  - [Twain](#twain)
 - [Directory Structure](#directory-structure)
 - [Contributing](#contributing)
 - [License](#license)
@@ -24,24 +23,16 @@ A powerful command-line tool to download and manage audio files. **Rehab** suppo
 
 ---
 
-## Features
+## Tools Overview
 
-- **Audio Downloading**  
-  Download audio files from YouTube, RSS feeds, or direct URLs. Convert videos into MP3 or MP4 with audio-only mode.
+### Rehab: Audio Downloader and Processor
+Rehab is a robust CLI tool for managing audio files, featuring YouTube downloading, podcast RSS handling, and audio recording.
 
-- **System Audio Recording**  
-  Record system audio input using `ffmpeg` with customizable duration and output.
+### Retex: LaTeX to PDF Compiler
+Retex provides a streamlined experience for compiling `.tex` files to PDF with progress tracking and auxiliary file management.
 
-- **Enhanced User Experience**  
-  - Progress bars and color-rich output using the `rich` library  
-  - Comprehensive error handling and logging
-
-- **Setup Automation**  
-  - `setup` command to auto-configure dependencies  
-  - Interactive INI file configuration
-
-- **Cross-Platform Compatibility**  
-  Works on Linux, macOS, and Windows.
+### Twain: Library and Journal Manager
+Twain is an interactive CLI program for managing a digital library and maintaining a daily journal.
 
 ---
 
@@ -49,128 +40,270 @@ A powerful command-line tool to download and manage audio files. **Rehab** suppo
 
 ### Prerequisites
 
-Ensure the following are installed:
-- **Python**: Version 3.8 or higher.
-- **ffmpeg**: Required for audio recording.
-- **yt-dlp**: For downloading YouTube videos and audio.
-- **pytube**: Alternative plugin for YouTube downloads.
+Ensure the following dependencies are installed:
+- **Python**: Version 3.8 or higher
+- **ffmpeg**: Required for audio processing
+- **yt-dlp**: For advanced YouTube downloads
+- **pdflatex**: For LaTeX compilation (Retex)
 
-### Steps
+### Setup
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/sohfix/rehab.git
-   cd rehab
-   ```
+   git clone https://github.com/sohfix/cli-tools-suite.git
+   cd cli-tools-suite
+Create and activate a virtual environment:
 
-2. Create a virtual environment:
-   ```bash
-   python3 -m venv renv
-   ```
+Linux/macOS:
+bash
+Copy
+Edit
+python3 -m venv renv
+source renv/bin/activate
+Windows:
+bash
+Copy
+Edit
+python -m venv renv
+renv\Scripts\activate
+Install dependencies:
 
-3. Activate the virtual environment:
-   - **Linux/macOS**:
-     ```bash
-     source renv/bin/activate
-     ```
-   - **Windows**:
-     ```bash
-     renv\Scripts\activate
-     ```
+bash
+Copy
+Edit
+pip install -r requirements.txt
+Usage
+Rehab
+Rehab offers tools for downloading, managing, and recording audio.
 
-4. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+Features:
+Download audio from YouTube or podcast RSS feeds.
+Record system audio directly.
+Automate dependency setup and configuration.
+Commands:
+Download Audio:
+bash
+Copy
+Edit
+python3 rehab.py download --youtube "https://youtu.be/example" --audio-only
+Setup:
+bash
+Copy
+Edit
+python3 rehab.py setup --linux
+Retex
+Compile LaTeX .tex files into PDFs with a user-friendly progress bar.
 
-5. Run the setup:
-   ```bash
-   python3 rehab.py setup --linux
-   ```
-   Replace `--linux` with `--windows` if you're on a Windows system.
+Features:
+Visual progress during compilation.
+Auxiliary file management (e.g., .aux, .log).
+Verbose mode for detailed output.
+Commands:
+Compile a .tex file:
+bash
+Copy
+Edit
+python3 retex.py document.tex -o output/
+Twain
+Manage your library and daily journal interactively.
 
----
-
-## Usage
-
-Rehab offers a variety of commands to suit your needs. Below is an overview of the available functionality.
-
-### General Structure
-
-```bash
-python3 rehab.py <command> [options]
-```
-
-### Commands
-
-#### `setup`
-Automate the installation of dependencies and configuration.
-
-- Example:
-  ```bash
-  python3 rehab.py setup --linux --ini
-  ```
-  - `--linux`: Installs dependencies for Linux.
-  - `--ini`: Walks through and validates the `settings.ini` configuration.
-
-#### `download`
-Download audio files from YouTube, RSS feeds, or provided URLs.
-
-- Options:
-  - `--youtube`: Provide a YouTube URL to download audio.
-  - `--rss`: Specify a podcast RSS feed URL to fetch episodes.
-  - `--count`: Limit the number of episodes downloaded from an RSS feed.
-  - `--audio-only`: Download only the audio in MP3 format.
-  - `--set-title`: Set a custom title for the downloaded content.
-
-- Example:
-  ```bash
-  python3 rehab.py download --youtube "https://youtu.be/dQw4w9WgXcQ" --audio-only
-  ```
-
-#### `record`
-Record system audio input.
-
-- Options:
-  - `--duration`: Set the duration of the recording (in seconds).
-  - `--output`: Specify the output file name.
-
-- Example:
-  ```bash
-  python3 rehab.py record --duration 60 --output recording.mp3
-  ```
-
----
-
-## Directory Structure
-
-```plaintext
-rehab/
+Features:
+Create and manage digital books with chapters.
+Maintain a daily journal for personal use.
+Intuitive, interactive menus with rich visuals.
+Commands:
+Launch Twain:
+bash
+Copy
+Edit
+python3 twania.py
+Use the menu to:
+Add books and chapters.
+Edit or delete chapters.
+View and manage a daily journal.
+Directory Structure
+plaintext
+Copy
+Edit
+cli-tools-suite/
 │
-├── rehab.py          # Main CLI program
-├── requirements.txt  # Python dependencies
-├── README.md         # Documentation (this file)
-├── pylogs/           # Logs for troubleshooting
-├── rehab-settings/   # Configuration files
-└── renv/             # Virtual environment
-```
+├── rehab.py         # Rehab CLI tool
+├── retex.py         # Retex CLI tool
+├── twania.py        # Twain CLI tool
+├── requirements.txt # Python dependencies
+├── README.md        # Documentation
+└── renv/            # Virtual environment
+Contributing
+Contributions are welcome! Submit issues or pull requests on the GitHub repository.
+
+License
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+Contact
+For inquiries or feedback, reach out to the author:
+
+Email: nicolas.tech808@gmail.com
+GitHub: github.com/sohfix
+markdown
+Copy
+Edit
+
+### Key Details:
+- **Full Markdown Syntax**: The document is fully structured and adheres to markdown formatting standards.
+- **Sections for Each Tool**: Includes individual descriptions and commands for **Rehab**, **Retex**, and **Twain**.
+- **Comprehensive Structure**: Includes installation, usage, directory layout, contributing, and contact information.
+
+Would you like to save this as a new README file or modify specific parts further?
+You said:
+i need the entire response in markdown. not just some of it. the whole response needs to be in markdown
+ChatGPT said:
+ChatGPT
+markdown
+Copy
+Edit
+# CLI Tools Suite: Rehab, Retex, and Twain
+
+![Version](https://img.shields.io/badge/version-1.0.0-green)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
+A suite of powerful command-line tools designed for audio processing, LaTeX compilation, and interactive library/journal management. This suite streamlines various workflows with rich visuals, robust features, and seamless integration.
 
 ---
 
-## Contributing
-
-Contributions are welcome! Feel free to submit issues or pull requests on the [GitHub repository](https://github.com/sohfix/rehab).
+## Table of Contents
+- [Tools Overview](#tools-overview)
+- [Installation](#installation)
+  - [Prerequisites](#prerequisites)
+  - [Setup](#setup)
+- [Usage](#usage)
+  - [Rehab](#rehab)
+  - [Retex](#retex)
+  - [Twain](#twain)
+- [Directory Structure](#directory-structure)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
 
 ---
 
-## License
+## Tools Overview
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+### Rehab: Audio Downloader and Processor
+Rehab is a robust CLI tool for managing audio files, featuring YouTube downloading, podcast RSS handling, and audio recording.
+
+### Retex: LaTeX to PDF Compiler
+Retex provides a streamlined experience for compiling `.tex` files to PDF with progress tracking and auxiliary file management.
+
+### Twain: Library and Journal Manager
+Twain is an interactive CLI program for managing a digital library and maintaining a daily journal.
 
 ---
 
-## Contact
+## Installation
 
-For any inquiries or feedback, reach out to the author:
-- **Email**: [nicolas.tech808@gmail.com](mailto:nicolas.tech808@gmail.com)
-- **GitHub**: [github.com/sohfix](https://github.com/sohfix)
+### Prerequisites
+
+Ensure the following dependencies are installed:
+- **Python**: Version 3.8 or higher
+- **ffmpeg**: Required for audio processing
+- **yt-dlp**: For advanced YouTube downloads
+- **pdflatex**: For LaTeX compilation (Retex)
+
+### Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/sohfix/cli-tools-suite.git
+   cd cli-tools-suite
+Create and activate a virtual environment:
+
+Linux/macOS:
+bash
+Copy
+Edit
+python3 -m venv renv
+source renv/bin/activate
+Windows:
+bash
+Copy
+Edit
+python -m venv renv
+renv\Scripts\activate
+Install dependencies:
+
+bash
+Copy
+Edit
+pip install -r requirements.txt
+Usage
+Rehab
+Rehab offers tools for downloading, managing, and recording audio.
+
+Features:
+Download audio from YouTube or podcast RSS feeds.
+Record system audio directly.
+Automate dependency setup and configuration.
+Commands:
+Download Audio:
+bash
+Copy
+Edit
+python3 rehab.py download --youtube "https://youtu.be/example" --audio-only
+Setup:
+bash
+Copy
+Edit
+python3 rehab.py setup --linux
+Retex
+Compile LaTeX .tex files into PDFs with a user-friendly progress bar.
+
+Features:
+Visual progress during compilation.
+Auxiliary file management (e.g., .aux, .log).
+Verbose mode for detailed output.
+Commands:
+Compile a .tex file:
+bash
+Copy
+Edit
+python3 retex.py document.tex -o output/
+Twain
+Manage your library and daily journal interactively.
+
+Features:
+Create and manage digital books with chapters.
+Maintain a daily journal for personal use.
+Intuitive, interactive menus with rich visuals.
+Commands:
+Launch Twain:
+bash
+Copy
+Edit
+python3 twania.py
+Use the menu to:
+Add books and chapters.
+Edit or delete chapters.
+View and manage a daily journal.
+Directory Structure
+plaintext
+Copy
+Edit
+cli-tools-suite/
+│
+├── rehab.py         # Rehab CLI tool
+├── retex.py         # Retex CLI tool
+├── twania.py        # Twain CLI tool
+├── requirements.txt # Python dependencies
+├── README.md        # Documentation
+└── renv/            # Virtual environment
+Contributing
+Contributions are welcome! Submit issues or pull requests on the GitHub repository.
+
+License
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+Contact
+For inquiries or feedback, reach out to the author:
+
+Email: nicolas.tech808@gmail.com
+GitHub: github.com/sohfix
