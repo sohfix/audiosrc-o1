@@ -6,7 +6,13 @@ import sys
 import requests
 import feedparser
 from rich.console import Console
-from rich.progress import Progress, BarColumn, TextColumn, TimeElapsedColumn
+from rich.progress import (
+    Progress,
+    BarColumn,
+    TextColumn,
+    TimeElapsedColumn,
+    ProgressColumn,
+)
 from pytube import YouTube
 import subprocess
 import logging
@@ -18,6 +24,20 @@ console = Console()
 
 # Version variable
 VERSION = "1.0.3"
+
+class MBPercentColumn(ProgressColumn):
+    """Custom column to show downloaded/total size in MB and percentage."""
+    def render(self, task) -> str:
+        if task.total is None:
+            return "0.00MB/??MB (0%)"
+
+        completed_mb = task.completed / (1024 * 1024)
+        total_mb = task.total / (1024 * 1024)
+        percentage = (task.completed / task.total) * 100 if task.total else 0
+
+        return f"{completed_mb:>5.2f}MB/{total_mb:>5.2f}MB ({percentage:>5.1f}%)"
+
+
 
 def ensure_output_dir(output_dir):
     """Ensure the output directory exists, creating it if necessary."""
@@ -159,22 +179,25 @@ def install_dependencies_windows(verbose):
     except subprocess.CalledProcessError as e:
         console.print(f"[red]Error installing dependencies:[/red] {e}", style="bold red")
 
+
 def download_with_progress(url, output_path, description="Downloading"):
-    """Download a file with a progress bar."""
+    """Download a file with a progress bar in MB and %."""
     response = requests.get(url, stream=True)
     total_size = int(response.headers.get('content-length', 0))
 
     with open(output_path, 'wb') as file, Progress(
-        TextColumn("[bold blue]{task.description}[/bold blue]"),
-        BarColumn(),
-        TextColumn("{task.completed}/{task.total} bytes"),
-        TimeElapsedColumn(),
+            TextColumn("[bold blue]{task.description}[/bold blue] "),
+            BarColumn(),
+            MBPercentColumn(),
+            TimeElapsedColumn(),
     ) as progress:
         task = progress.add_task(description, total=total_size)
 
         for chunk in response.iter_content(chunk_size=1024):
             file.write(chunk)
             progress.update(task, advance=len(chunk))
+
+    console.print(f"[green]Download complete! Saved at:[/green] {output_path}")
 
 def download_podcast_rss(rss_url, output_dir, count=None, searchby=None, debug=False, verbose=False):
     """Download episodes from a podcast RSS feed."""
