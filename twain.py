@@ -10,6 +10,7 @@ from rich.progress import Progress
 from rich.prompt import Prompt
 from rich.text import Text
 from time import sleep
+import sys
 
 # VERSION
 VERSION = "1.0.0"
@@ -24,6 +25,11 @@ journal = {}
 # Utility to clear the screen
 def clear_screen():
     console.clear()
+
+def close_term():
+    console.print("\n[red]Exiting...[reset]")
+    sys.exit(0)
+
 
 # Display banner
 def display_banner():
@@ -220,3 +226,4 @@ if __name__ == "__main__":
     main_menu()
     time.sleep(3)
     clear_screen()
+    close_term()

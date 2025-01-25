@@ -38,7 +38,6 @@ class MBPercentColumn(ProgressColumn):
         return f"{completed_mb:>5.2f}MB/{total_mb:>5.2f}MB ({percentage:>5.1f}%)"
 
 
-
 def ensure_output_dir(output_dir):
     """Ensure the output directory exists, creating it if necessary."""
     try:
@@ -359,6 +358,142 @@ def handle_setup_command(args):
     else:
         console.print("[red]OS detection failed or unsupported OS. Please specify --linux or --windows.[/red]", style="bold red")
 
+
+def handle_man_command():
+    """
+    Display a thorough manual (man page) explaining how to use the Rehab script,
+    its commands, options, and typical usage scenarios.
+    """
+    manual_text = f"""
+[bold cyan]NAME[/bold cyan]
+    rehab - A command-line tool to download audio files (podcasts, YouTube) and manage basic app settings.
+
+[bold cyan]SYNOPSIS[/bold cyan]
+    rehab [command] [options]
+
+[bold cyan]DESCRIPTION[/bold cyan]
+    Rehab is a Python command-line utility designed to simplify the process of downloading audio
+    from various sources, such as podcast RSS feeds or YouTube videos. It can also manage its
+    own configuration settings (storing the user's name, password, and OS preferences) and
+    install dependencies required to run the tool (e.g., ffmpeg, yt-dlp).
+
+[bold cyan]COMMANDS[/bold cyan]
+
+    1. [bold]download[/bold]
+       Download audio from a podcast RSS feed and/or YouTube.
+
+       Options for [bold]download[/bold]:
+         - [italic]-d, --dir[/italic]
+             Specify the base output directory for downloads.
+             Default: $HOME/Desktop/Audio
+
+         - [italic]--rss[/italic]
+             Provide an RSS feed URL (e.g., https://site/feed.xml).
+             The script will parse the RSS and download available episodes as MP3.
+
+         - [italic]--count[/italic]
+             Number of recent podcast episodes to download.
+             If omitted, all available episodes in the RSS feed are checked.
+
+         - [italic]--search-by[/italic]
+             A substring to filter podcast episodes by title. Case-insensitive.
+
+         - [italic]--youtube[/italic]
+             Provide a YouTube video URL to download.
+
+         - [italic]--set-title[/italic]
+             Assign a custom title/name to the downloaded YouTube file.
+
+         - [italic]--use-title[/italic]
+             Use the official YouTube video title for the downloaded file.
+
+         - [italic]--audio-only[/italic]
+             Download only the audio from YouTube (MP3) instead of video.
+
+         - [italic]--yt-dlp[/italic]
+             Use yt-dlp for downloading YouTube content instead of pytube.
+
+         - [italic]--log-session[/italic]
+             Enable session logging. Logs will be placed in '$HOME/pylogs/rehab'.
+
+         - [italic]--verbose[/italic]
+             Enable more detailed console output at each step.
+
+         - [italic]--version[/italic]
+             Print the version of this script and exit.
+
+       Example usage:
+         rehab download --rss https://example.com/podcast/feed.xml --count 5
+         rehab download --rss https://example.com/podcast/feed.xml --search-by "special guest"
+         rehab download --youtube https://youtube.com/watch?v=exampleID --audio-only
+         rehab download --youtube https://youtube.com/watch?v=exampleID --use-title
+
+    2. [bold]setup[/bold]
+       Install dependencies and manage the script's settings.
+
+       Options for [bold]setup[/bold]:
+         - [italic]--linux[/italic]
+             Install dependencies specifically for Linux systems (e.g., ffmpeg, yt-dlp via apt-get).
+
+         - [italic]--windows[/italic]
+             Install dependencies specifically for Windows systems (e.g., ffmpeg, yt-dlp via choco).
+
+         - [italic]--config[/italic]
+             Manage settings.ini (create, edit, or view). The user details and system OS are stored here.
+
+         - [italic]--verbose[/italic]
+             Enable more detailed console output.
+
+       Example usage:
+         rehab setup --linux
+         rehab setup --config
+         rehab setup --windows
+
+    3. [bold]man[/bold]
+       Display this manual page with detailed instructions and explanations for each command and option.
+
+[bold cyan]CONFIGURATION[/bold cyan]
+    Rehab uses a settings.ini file stored in $HOME/rehab-settings. 
+    The [user] section includes:
+        name = <Your Name>
+        password = <Your Password>
+    The [system] section includes:
+        os = <Operating System>
+
+    You can create or modify these settings with:
+        rehab setup --config
+
+[bold cyan]EXAMPLES[/bold cyan]
+    - Download the newest 3 episodes from a podcast feed and log the session:
+        rehab download --rss https://somepodcast/feed.xml --count 3 --log-session
+
+    - Download audio from YouTube using the official title:
+        rehab download --youtube https://youtube.com/watch?v=exampleID --audio-only --use-title
+
+    - Install dependencies on Linux if not already installed:
+        rehab setup --linux
+
+    - Manage or view the settings.ini file:
+        rehab setup --config
+
+[bold cyan]VERSION[/bold cyan]
+    {VERSION}
+
+[bold cyan]AUTHOR[/bold cyan]
+    This script is maintained by [Your Project/Name]. 
+    For any inquiries or issues, please check the relevant project repository or documentation.
+
+[bold cyan]REPORTING BUGS[/bold cyan]
+    Please report any bugs or inconsistencies in the project's issue tracker or via email
+    if that is provided in the official documentation.
+
+[bold cyan]COPYRIGHT[/bold cyan]
+    This tool is distributed under the MIT License (or whichever applies). 
+    See the source code for more details.
+"""
+    console.print(manual_text, style="white")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Rehab: download audio", add_help=True)
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -388,6 +523,9 @@ def main():
     setup_parser.add_argument("--windows", action="store_true", help="Install dependencies for Windows.")
     setup_parser.add_argument("--config", action="store_true", help="Create, edit, or view the settings.ini file.")
     setup_parser.add_argument("--verbose", action="store_true", help="Show additional messages explaining each step.")
+
+    # Man Command
+    man_parser = subparsers.add_parser("man", help="Displays a thorough manual for the Rehab tool.")
 
     args = parser.parse_args()
 
@@ -421,6 +559,10 @@ def main():
                 yt_dlp=args.yt_dlp,
                 verbose=args.verbose
             )
+
+    elif args.command == "man":
+        handle_man_command()
+
 
 if __name__ == "__main__":
     main()
