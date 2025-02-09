@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/rehab.iml" filepath="$PROJECT_DIR$/.idea/rehab.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/audiosrc.iml" filepath="$PROJECT_DIR$/.idea/audiosrc.iml" />
     </modules>
   </component>
 </project>
