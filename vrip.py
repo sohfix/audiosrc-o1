@@ -47,16 +47,16 @@ def clear_screen():
 # Dynamically determine where the config file should live.
 def get_config_path():
     """
-    Returns the path to the rehab.ini file.
-      - On Linux: ~/programs/rehab-ini/rehab.ini
-      - On Windows: <script_directory>/rehab.ini
+    Returns the path to the vrip.ini file.
+      - On Linux: ~/programs/vrip-ini/vrip.ini
+      - On Windows: <script_directory>/vrip.ini
     """
     if os.name == 'nt':
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        return os.path.join(script_dir, "rehab.ini")
+        return os.path.join(script_dir, "vrip.ini")
     else:
         home_dir = os.path.expanduser("~")
-        return os.path.join(home_dir, "programs", "rehab-ini", "rehab.ini")
+        return os.path.join(home_dir, "programs", "vrip-ini", "vrip.ini")
 
 def ensure_output_dir(output_dir):
     """Ensure the output directory exists, creating it if necessary."""
@@ -72,7 +72,7 @@ def setup_logging(log_session):
         return None
 
     # Use the user's home directory in a cross-platform way
-    log_dir = os.path.join(os.path.expanduser("~"), "pylogs", "rehab")
+    log_dir = os.path.join(os.path.expanduser("~"), "pylogs", "vrip")
     ensure_output_dir(log_dir)
 
     log_file = os.path.join(log_dir, f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
@@ -118,8 +118,8 @@ def install_dependencies_windows(verbose):
 
 def init_config():
     """
-    Creates or loads a rehab.ini config in the OS-specific location:
-      - Linux:   ~/programs/rehab-ini/rehab.ini
+    Creates or loads a vrip.ini config in the OS-specific location:
+      - Linux:   ~/programs/vrip-ini/vrip.ini
       - Windows: same directory as the script
     If the file is missing, create with default placeholders.
     """
@@ -145,13 +145,13 @@ def init_config():
         }
         with open(config_path, "w") as configfile:
             config.write(configfile)
-        console.print("[green]Default rehab.ini created.[/green]", style="bold green")
+        console.print("[green]Default vrip.ini created.[/green]", style="bold green")
 
     return config, config_path
 
 def validate_config():
     """
-    Interactive check to ensure the user, password, and system OS are set in rehab.ini.
+    Interactive check to ensure the user, password, and system OS are set in vrip.ini.
     If missing, prompt the user to update them.
     """
     config, config_path = init_config()
@@ -316,7 +316,7 @@ def download_youtube_content(url, output_dir, audio_only=False, use_title=False,
     clear_screen()
 
 def manage_settings_config():
-    """Create, edit, or view rehab.ini from the known OS-specific path."""
+    """Create, edit, or view vrip.ini from the known OS-specific path."""
     config_path = get_config_path()
     config, _ = init_config()
     console.print("[blue]Settings management selected.[/blue]", style="bold blue")
@@ -364,7 +364,7 @@ def handle_init_command(args):
     """
     1. Auto-detect OS (Windows or Linux).
     2. Install the appropriate dependencies.
-    3. Create or load rehab.ini in the right location.
+    3. Create or load vrip.ini in the right location.
     4. Prompt user to fill missing details if needed.
     """
     current_os = platform.system().lower()
@@ -384,17 +384,17 @@ def handle_init_command(args):
 
 def handle_man_command():
     """
-    Display a thorough manual (man page) explaining how to use the Rehab script.
+    Display a thorough manual (man page) explaining how to use the vrip script.
     """
     manual_text = f"""
 [bold cyan]NAME[/bold cyan]
-    rehab - A command-line tool to download audio files (podcasts, YouTube) and manage basic app settings.
+    vrip - A command-line tool to download audio files (podcasts, YouTube) and manage basic app settings.
 
 [bold cyan]SYNOPSIS[/bold cyan]
-    rehab [command] [options]
+    vrip [command] [options]
 
 [bold cyan]DESCRIPTION[/bold cyan]
-    Rehab is a Python command-line utility designed to simplify the process of downloading audio
+    vrip is a Python command-line utility designed to simplify the process of downloading audio
     from various sources, such as podcast RSS feeds or YouTube videos. It can also manage its
     own configuration settings and install dependencies required to run the tool.
 
@@ -402,10 +402,10 @@ def handle_man_command():
 
     1. [bold]init[/bold]
        Automatically detect your OS (Windows or Linux), install dependencies (ffmpeg, yt-dlp, etc.),
-       and create/load the rehab.ini config file. Then interactively prompt for missing details.
+       and create/load the vrip.ini config file. Then interactively prompt for missing details.
 
        Example usage:
-         rehab init
+         vrip init
 
     2. [bold]download[/bold]
        Download audio from a podcast RSS feed and/or YouTube.
@@ -439,8 +439,8 @@ def handle_man_command():
              Display the script version and exit.
 
        Example usage:
-         rehab download --rss https://example.com/podcast/feed.xml --count 5
-         rehab download --youtube https://youtube.com/watch?v=abc --audio-only --use-title
+         vrip download --rss https://example.com/podcast/feed.xml --count 5
+         vrip download --youtube https://youtube.com/watch?v=abc --audio-only --use-title
 
     3. [bold]setup[/bold]
        Manually install dependencies or manage config.
@@ -449,16 +449,16 @@ def handle_man_command():
          - [italic]--verbose[/italic]
 
        Examples:
-         rehab setup --linux
-         rehab setup --config
-         rehab setup --windows
+         vrip setup --linux
+         vrip setup --config
+         vrip setup --windows
 
     4. [bold]man[/bold]
        Display this manual.
 
 [bold cyan]CONFIGURATION[/bold cyan]
-    Rehab uses a "rehab.ini" file in:
-        - Linux:   ~/programs/rehab-ini/rehab.ini
+    vrip uses a "vrip.ini" file in:
+        - Linux:   ~/programs/vrip-ini/vrip.ini
         - Windows: Same directory as the script
 
 [bold cyan]VERSION[/bold cyan]
@@ -473,11 +473,11 @@ def handle_man_command():
     console.print(manual_text, style="white")
 
 def main():
-    parser = argparse.ArgumentParser(description="Rehab: download audio", add_help=True)
+    parser = argparse.ArgumentParser(description="vrip: download audio", add_help=True)
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # init command
-    init_parser = subparsers.add_parser("init", help="Auto-detect OS, install dependencies, and set up rehab.ini.")
+    init_parser = subparsers.add_parser("init", help="Auto-detect OS, install dependencies, and set up vrip.ini.")
     init_parser.add_argument("--verbose", action="store_true", help="Show additional debugging information.")
 
     # download command
@@ -492,7 +492,7 @@ def main():
     download_parser.add_argument("--use-title", action="store_true", help="Use the YouTube video's title for the filename.")
     download_parser.add_argument("--audio-only", action="store_true", help="Download only the audio (mp3).")
     download_parser.add_argument("--yt-dlp", action="store_true", help="Use yt-dlp instead of pytube for YouTube.")
-    download_parser.add_argument("--log-session", action="store_true", help="Log the session in ~/pylogs/rehab.")
+    download_parser.add_argument("--log-session", action="store_true", help="Log the session in ~/pylogs/vrip.")
     download_parser.add_argument("--verbose", action="store_true", help="Show additional debugging information.")
     download_parser.add_argument("--version", action="store_true", help="Display the current version of the script.")
 
@@ -500,11 +500,11 @@ def main():
     setup_parser = subparsers.add_parser("setup", help="Manually install dependencies or manage config.")
     setup_parser.add_argument("--linux", action="store_true", help="Install dependencies for Linux.")
     setup_parser.add_argument("--windows", action="store_true", help="Install dependencies for Windows.")
-    setup_parser.add_argument("--config", action="store_true", help="Create, edit, or view rehab.ini.")
+    setup_parser.add_argument("--config", action="store_true", help="Create, edit, or view vrip.ini.")
     setup_parser.add_argument("--verbose", action="store_true", help="Show additional debug messages.")
 
     # man command
-    man_parser = subparsers.add_parser("man", help="Display a thorough manual for the Rehab tool.")
+    man_parser = subparsers.add_parser("man", help="Display a thorough manual for the vrip tool.")
 
     args = parser.parse_args()
 
