@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+#!/home/sohfix/PycharmProjects/audiosrc/audiosrc-env/bin/python3.13
+
+@AUTHOR_EMAIL = 'sohfix'
 import os
 import sys
 import requests
@@ -22,7 +24,7 @@ import shutil
 
 console = Console()
 
-VERSION = "1.0.3"
+VERSION = "01.01.3 [ruv]"
 
 
 class MBPercentColumn(ProgressColumn):
