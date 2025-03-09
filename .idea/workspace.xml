@@ -128,7 +128,7 @@
       <workItem from="1740174600718" duration="171000" />
       <workItem from="1740860949418" duration="1597000" />
       <workItem from="1740863310902" duration="714000" />
-      <workItem from="1741559762822" duration="885000" />
+      <workItem from="1741559762822" duration="1330000" />
     </task>
     <task id="LOCAL-00001" summary="INIT">
       <option name="closed" value="true" />
@@ -202,7 +202,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741559972226</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="copydeck added">
+      <option name="closed" value="true" />
+      <created>1741561630276</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1741561630276</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

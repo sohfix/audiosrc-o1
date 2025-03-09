@@ -1,4 +1,3 @@
-#OPTIMIZED FOR WINDOWS
 import os
 import sys
 import json
@@ -140,8 +139,7 @@ def backup_file(src_file, dest_file):
             errors_count += 1
             return
 
-    # Update the cmd window with the file being processed
-    # \033[93m is yellow, \033[0m resets color
+    # Update the console with the file being processed
     sys.stdout.write("\r\033[93mProcessing: " + src_file + "\033[0m" + " " * 20)
     sys.stdout.flush()
 
@@ -160,7 +158,6 @@ def backup_file(src_file, dest_file):
         errors_count += 1
     finally:
         files_processed += 1
-        # Update progress for GUI via the queue
         progress_percent = int((files_processed / total_files) * 100) if total_files > 0 else 100
         progress_queue.put(("update", progress_percent, f"Processed {files_processed} of {total_files} files."))
 
@@ -186,14 +183,12 @@ def backup_worker():
     Loads configuration, counts total files, processes backups, and sends a final summary.
     """
     global total_files, files_copied, files_skipped, errors_count, files_processed
-    # Reset counters
     files_copied = files_skipped = errors_count = files_processed = 0
     config = load_config()
     validate_config(config)
     source_folders = config.get("source_folders", [])
     backup_destination = config.get("backup_destination", "")
 
-    # Count total files across all source folders
     total_files = 0
     for folder in source_folders:
         if os.path.exists(folder):
@@ -205,7 +200,6 @@ def backup_worker():
         progress_queue.put(("done", 0, "No files to backup."))
         return
 
-    # Process each source folder
     for folder in source_folders:
         if os.path.exists(folder):
             progress_queue.put(("update", None, f"Backing up folder: {folder}"))
@@ -214,7 +208,6 @@ def backup_worker():
             logging.warning(f"Source folder does not exist: {folder}")
             errors_count += 1
 
-    # Send final summary to the GUI
     summary = (
         f"Backup Completed:\n\n"
         f"Files Copied: {files_copied}\n"
@@ -240,10 +233,11 @@ def show_summary_popup(parent, summary):
 
 def run_backup_process(root, main_menu):
     """
-    Hide the main menu, display the progress window,
-    run the backup process, and then return to main menu.
+    Hide the main menu frame, display the progress window,
+    run the backup process, then return to the main menu.
     """
-    main_menu.withdraw()
+    # Hide main menu frame
+    main_menu.pack_forget()
     progress_win = tk.Toplevel(root)
     progress_win.title("Backup Progress")
     progress_win.geometry("500x150")
@@ -271,7 +265,8 @@ def run_backup_process(root, main_menu):
                     status_label.config(text="Backup Completed")
                     show_summary_popup(progress_win, summary)
                     progress_win.destroy()
-                    main_menu.deiconify()
+                    # Re-show main menu frame
+                    main_menu.pack(expand=True, fill="both", padx=20, pady=20)
                     return
         except queue.Empty:
             pass
@@ -293,27 +288,26 @@ def auto_backup_trigger(root, main_menu):
     """
     answer = messagebox.askokcancel("Auto Backup",
                                     "Scheduled backup is ready.\nDo you want to backup now?",
-                                    parent=main_menu)
+                                    parent=root)
     if answer:
         run_backup_process(root, main_menu)
     else:
-        main_menu.deiconify()
+        main_menu.pack(expand=True, fill="both", padx=20, pady=20)
 
 
 def on_set_auto_backup(root, main_menu, interval_hours):
     """
     Handler for setting auto backup.
-    Hides the main menu and schedules auto backup after the selected interval.
+    Hides the main menu frame and schedules auto backup after the selected interval.
     """
     try:
         interval = int(interval_hours)
     except ValueError:
         messagebox.showerror("Input Error", "Please select a valid interval.")
         return
-    # Convert hours to milliseconds
     interval_ms = interval * 60 * 60 * 1000
-    main_menu.withdraw()
-    messagebox.showinfo("Auto Backup Scheduled", f"Auto backup scheduled in {interval} hour(s).", parent=main_menu)
+    main_menu.pack_forget()
+    messagebox.showinfo("Auto Backup Scheduled", f"Auto backup scheduled in {interval} hour(s).", parent=root)
     root.after(interval_ms, auto_backup_trigger, root, main_menu)
 
 
@@ -322,7 +316,6 @@ def main():
     if platform.system() == "Windows":
         os.system("")
 
-    # Print the banner to the console at startup.
     print_banner()
 
     logging.basicConfig(
@@ -331,10 +324,9 @@ def main():
         handlers=[logging.StreamHandler()]
     )
 
-    # Set up the main Tkinter window (GUI)
     root = tk.Tk()
     root.title("Backup Application")
-    root.geometry("400x200")
+    root.geometry("400x250")
 
     main_menu = tk.Frame(root)
     main_menu.pack(expand=True, fill="both", padx=20, pady=20)
@@ -342,12 +334,10 @@ def main():
     title_label = tk.Label(main_menu, text="Backup Application", font=("Arial", 16))
     title_label.pack(pady=10)
 
-    # Backup Now button
     backup_now_btn = tk.Button(main_menu, text="Backup Now", width=20,
                                command=lambda: on_backup_now(root, main_menu))
     backup_now_btn.pack(pady=5)
 
-    # Auto Backup section
     auto_frame = tk.Frame(main_menu)
     auto_frame.pack(pady=5)
 
@@ -363,7 +353,6 @@ def main():
                                 command=lambda: on_set_auto_backup(root, main_menu, interval_var.get()))
     auto_backup_btn.pack(side="left", padx=5)
 
-    # Exit button
     exit_btn = tk.Button(main_menu, text="Exit", width=20, command=root.quit)
     exit_btn.pack(pady=10)
 
