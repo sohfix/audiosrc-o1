@@ -4,7 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="02d8744d-b7f7-4480-b809-6465d74964dd" name="Changes" comment="copydeck added" />
+    <list default="true" id="02d8744d-b7f7-4480-b809-6465d74964dd" name="Changes" comment="copydeck added">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hiker-src/books/book-data.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hiker-src/config.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hiker-src/hiker.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hiker-src/hiker.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hiker-src/hitchhiker_game.db" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -127,7 +135,7 @@
       <workItem from="1740860949418" duration="1597000" />
       <workItem from="1740863310902" duration="714000" />
       <workItem from="1741559762822" duration="1330000" />
-      <workItem from="1741717325921" duration="318000" />
+      <workItem from="1741717325921" duration="991000" />
     </task>
     <task id="LOCAL-00001" summary="INIT">
       <option name="closed" value="true" />
@@ -209,7 +217,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741561630276</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="copydeck added">
+      <option name="closed" value="true" />
+      <created>1741720117835</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1741720117835</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
