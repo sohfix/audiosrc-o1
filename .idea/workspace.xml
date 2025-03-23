@@ -132,7 +132,8 @@
       <workItem from="1740863310902" duration="714000" />
       <workItem from="1741559762822" duration="1330000" />
       <workItem from="1741717325921" duration="3305000" />
-      <workItem from="1742606869255" duration="301000" />
+      <workItem from="1742606869255" duration="314000" />
+      <workItem from="1742607188409" duration="20000" />
     </task>
     <task id="LOCAL-00001" summary="INIT">
       <option name="closed" value="true" />
@@ -238,7 +239,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741727964354</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="vrip updated to 1.02.0 rss only&#10;massive overhaul&#10;written for pyinstaller">
+      <option name="closed" value="true" />
+      <created>1742607178418</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1742607178418</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

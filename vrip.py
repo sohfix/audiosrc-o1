@@ -1,4 +1,6 @@
-#OPTIMIZED FOR WINDOWS
+#!/usr/bin/env python3
+# vrip - a command-line tool for downloading podcast RSS feeds with a reorganized menu and advanced options.
+
 import os
 import sys
 import platform
@@ -6,6 +8,7 @@ import configparser
 import logging
 import requests
 import feedparser
+import time
 from datetime import datetime
 from rich.console import Console
 from rich.progress import (
@@ -18,7 +21,7 @@ from rich.progress import (
 from rich.panel import Panel
 
 console = Console()
-VERSION = "01.02.0 [rss-only]"
+VERSION = "01.03.0 [rss-only: menu+skip+oldest-first]"
 
 
 class MBPercentColumn(ProgressColumn):
@@ -106,15 +109,12 @@ def init_config():
         }
         config["system"] = {
             "os": platform.system().lower(),
-            # Let’s store a default output directory, can be changed via config
             "default_output_dir": r"C:\vrip_tools\downloads" if "windows" in platform.system().lower()
             else os.path.join(os.path.expanduser("~"), "podcasts")
         }
         config["logging"] = {
-            # Where logs will be stored, can change in config
             "log_dir": r"C:\vrip_tools\logs" if "windows" in platform.system().lower()
             else os.path.join(os.path.expanduser("~"), "pylogs", "vrip"),
-            # Default logging level: DEBUG, INFO, WARNING, ERROR, CRITICAL
             "log_level": "INFO"
         }
         with open(config_path, "w") as configfile:
@@ -132,7 +132,6 @@ def setup_logging():
     log_dir = config["logging"].get("log_dir", "")
     log_level_str = config["logging"].get("log_level", "INFO")
 
-    # Convert string to actual logging level
     numeric_level = getattr(logging, log_level_str.upper(), None)
     if not isinstance(numeric_level, int):
         numeric_level = logging.INFO  # fallback
@@ -147,7 +146,6 @@ def setup_logging():
                 style="red"
             )
         )
-        # We can continue but logs won't be written properly
         log_dir = ""
 
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -176,8 +174,6 @@ def setup_logging():
                 style="yellow"
             )
         )
-
-    # Optional: Log a start-of-session message
     logging.info("Logging initialized.")
 
 
@@ -251,13 +247,9 @@ def validate_config():
 
 def install_dependencies_windows(verbose=False):
     """
-    Install required dependencies for Windows using Chocolatey (if relevant).
-    Possibly just logging that we 'would' install, or no-ops if none needed.
+    Install required dependencies for Windows using Chocolatey (placeholder).
     """
     console.print(Panel("Checking/Installing dependencies (Windows)...", style="blue"))
-    # Example logic: If you need `ffmpeg`, `python-requests`, etc. installed system-wide
-    # This is just a placeholder—real usage might vary.
-    # You can also disable or remove if not needed for your environment.
     if verbose:
         console.print(Panel("Would run: choco install <deps>", style="cyan"))
 
@@ -266,8 +258,7 @@ def install_dependencies_windows(verbose=False):
 
 def install_dependencies_linux(verbose=False):
     """
-    Install required dependencies for Linux using apt-get (if relevant).
-    Possibly just logging that we 'would' install, or no-ops if none needed.
+    Install required dependencies for Linux using apt-get (placeholder).
     """
     console.print(Panel("Checking/Installing dependencies (Linux)...", style="blue"))
     if verbose:
@@ -303,9 +294,18 @@ def download_with_progress(url, output_path, description="Downloading"):
     logging.info(f"Downloaded: {url} -> {output_path}")
 
 
-def download_podcast_rss(rss_url, output_dir, count=None, searchby=None, verbose=False):
-    """Download episodes from a podcast RSS feed."""
-    logging.info(f"Starting RSS download from: {rss_url}, output_dir={output_dir}, count={count}, searchby={searchby}")
+def download_podcast_rss(rss_url, output_dir, count=None, searchby=None, verbose=False, oldest_first=False):
+    """
+    Download episodes from a podcast RSS feed.
+    :param rss_url: The URL of the RSS feed
+    :param output_dir: Where to store the MP3 files
+    :param count: How many episodes to download (None for all)
+    :param searchby: Optional substring filter for episode titles
+    :param verbose: Print additional details
+    :param oldest_first: If True, sort episodes from oldest to newest; otherwise newest first
+    """
+    logging.info(
+        f"Starting RSS download from: {rss_url}, output_dir={output_dir}, count={count}, searchby={searchby}, oldest_first={oldest_first}")
 
     if verbose:
         console.print(
@@ -330,13 +330,11 @@ def download_podcast_rss(rss_url, output_dir, count=None, searchby=None, verbose
         return
 
     # Filter by search term if provided
-    filtered_entries = (
+    entries = (
         [entry for entry in feed.entries if searchby.lower() in entry.title.lower()]
         if searchby else feed.entries
     )
-    entries_to_download = filtered_entries[:count] if count else filtered_entries
-
-    if not entries_to_download:
+    if not entries:
         console.print(
             Panel(
                 f"No episodes found matching the search term:\n'{searchby}'",
@@ -347,7 +345,47 @@ def download_podcast_rss(rss_url, output_dir, count=None, searchby=None, verbose
         logging.warning(f"No entries match search term '{searchby}'.")
         return
 
-    # Download each
+    # Sort episodes if we can detect their published or updated date
+    # Feedparser sets .published_parsed or .updated_parsed if available
+    # We use whichever is present, otherwise fallback to original order
+    def get_date(entry):
+        # Try published_parsed, then updated_parsed
+        if hasattr(entry, 'published_parsed') and entry.published_parsed:
+            return time.mktime(entry.published_parsed)
+        elif hasattr(entry, 'updated_parsed') and entry.updated_parsed:
+            return time.mktime(entry.updated_parsed)
+        else:
+            return None
+
+    # We'll separate those we can date from those we can't
+    dated_entries = [(e, get_date(e)) for e in entries]
+    dated_entries_with_time = [(e, dt) for (e, dt) in dated_entries if dt is not None]
+    dated_entries_without_time = [e for (e, dt) in dated_entries if dt is None]
+
+    # Sort those that have a valid date
+    # oldest_first => ascending by date
+    # newest_first => descending by date
+    dated_entries_with_time.sort(key=lambda x: x[1], reverse=(not oldest_first))
+
+    # Merge them back:
+    #   - If we want oldest_first, put undated at the end, or if we want newest_first, put them at the front
+    # (This is arbitrary since they have no date)
+    if oldest_first:
+        sorted_entries = [e[0] for e in dated_entries_with_time] + dated_entries_without_time
+    else:
+        sorted_entries = dated_entries_without_time + [e[0] for e in dated_entries_with_time]
+
+    # If user requested a specific count, slice
+    # If they want the oldest 100, we've sorted ascending, so the first 100 are the oldest
+    # If they want the newest 100, we've sorted descending, so the first 100 are the newest
+    entries_to_download = sorted_entries[:count] if count else sorted_entries
+
+    if not entries_to_download:
+        console.print(
+            Panel("No episodes to download after applying sorting/count.", title="Podcast RSS", style="yellow"))
+        return
+
+    # Download each episode
     for index, entry in enumerate(entries_to_download, start=1):
         title = entry.title
         link = entry.enclosures[0].href if entry.enclosures else None
@@ -367,17 +405,29 @@ def download_podcast_rss(rss_url, output_dir, count=None, searchby=None, verbose
         sanitized_title = "".join(c for c in title if c.isalnum() or c in " _-").rstrip()
         file_path = os.path.join(output_dir, f"{sanitized_title}.mp3")
 
+        # Check if file already exists
+        if os.path.exists(file_path):
+            console.print(
+                Panel(
+                    f"Skipping (file exists): '{file_path}'",
+                    title="Podcast RSS",
+                    style="yellow"
+                )
+            )
+            logging.info(f"Skipping download (already exists): {file_path}")
+            continue
+
         if verbose:
             console.print(
                 Panel(
                     f"Downloading podcast episode:\n{title}\nEpisode link:\n{link}\nSaving to:\n{file_path}",
-                    title="Podcast RSS",
+                    title=f"Podcast {index}/{len(entries_to_download)}",
                     style="blue"
                 )
             )
 
         try:
-            download_with_progress(link, file_path, description=f"Podcast {index}/{len(entries_to_download)}")
+            download_with_progress(link, file_path, description=f"Episode {index}/{len(entries_to_download)}")
         except requests.RequestException as e:
             console.print(
                 Panel(
@@ -390,6 +440,133 @@ def download_podcast_rss(rss_url, output_dir, count=None, searchby=None, verbose
             continue
 
         clear_screen()
+
+
+####################
+#     SUBMENUS     #
+####################
+
+def menu_settings():
+    """
+    Submenu for settings:
+    1) init
+    2) install dependencies (linux or windows)
+    3) manage config
+    4) return
+    """
+    while True:
+        menu_text = (
+            "[bold]Settings Menu[/bold]\n"
+            "1) Init (auto-detect OS, install deps, configure vrip.ini)\n"
+            "2) Install dependencies (specify Linux or Windows)\n"
+            "3) Manage config (view/edit)\n"
+            "4) Return to main menu"
+        )
+        console.print(Panel(menu_text, title="Settings", style="cyan"))
+        choice = console.input("\nEnter choice: ").strip()
+
+        if choice == "1":
+            handle_init_command()
+        elif choice == "2":
+            submenu_deps()
+        elif choice == "3":
+            manage_settings_config()
+        elif choice == "4":
+            break
+        else:
+            console.print(Panel("Invalid choice.", title="Error", style="red"))
+
+
+def submenu_deps():
+    """Submenu for installing dependencies (Linux or Windows)"""
+    menu_text = (
+        "[bold]Dependency Installer[/bold]\n"
+        "1) Linux\n"
+        "2) Windows\n"
+        "3) Return to Settings menu"
+    )
+    console.print(Panel(menu_text, title="Dependencies", style="cyan"))
+    choice = console.input("\nEnter choice: ").strip()
+
+    if choice == "1":
+        install_dependencies_linux(verbose=True)
+    elif choice == "2":
+        install_dependencies_windows(verbose=True)
+    elif choice == "3":
+        return
+    else:
+        console.print(Panel("Invalid choice.", title="Error", style="red"))
+
+
+def menu_manual_about():
+    """
+    Submenu for Manual & About
+    1) Manual
+    2) About
+    3) Return
+    """
+    while True:
+        menu_text = (
+            "[bold]Manual & About[/bold]\n"
+            "1) Show manual\n"
+            f"2) About (version {VERSION})\n"
+            "3) Return to main menu"
+        )
+        console.print(Panel(menu_text, title="Help/Info", style="cyan"))
+        choice = console.input("\nEnter choice: ").strip()
+
+        if choice == "1":
+            handle_man_command()
+        elif choice == "2":
+            console.print(
+                Panel(
+                    f"vrip version {VERSION}\nA minimal RSS downloading tool.\nAuthor: Your Project",
+                    title="About",
+                    style="green"
+                )
+            )
+        elif choice == "3":
+            break
+        else:
+            console.print(Panel("Invalid choice.", title="Error", style="red"))
+
+
+####################
+#    COMMANDS      #
+####################
+
+def handle_init_command():
+    """
+    Auto-detect OS, 'install dependencies', create or load vrip.ini,
+    and prompt for any missing details.
+    """
+    current_os = platform.system().lower()
+    console.print(Panel(f"Running 'init' command for OS = {current_os}",
+                        title="Init", style="blue"))
+
+    if "windows" in current_os:
+        install_dependencies_windows(verbose=True)
+    elif "linux" in current_os:
+        install_dependencies_linux(verbose=True)
+    else:
+        console.print(
+            Panel(
+                "Unsupported OS detected. Abort.",
+                title="Error",
+                style="red"
+            )
+        )
+        return
+
+    init_config()
+    validate_config()
+    console.print(
+        Panel(
+            "Initialization complete!",
+            title="Init",
+            style="green"
+        )
+    )
 
 
 def manage_settings_config():
@@ -442,7 +619,6 @@ def manage_settings_config():
                 config["logging"]["log_level"] = new_log_level
                 changed = True
 
-            # Save changes
             if changed:
                 with open(config_path, "w") as cf:
                     config.write(cf)
@@ -451,86 +627,6 @@ def manage_settings_config():
                 console.print(Panel("No advanced settings changed.", style="green"))
     else:
         console.print(Panel("Invalid action. Please choose 'view' or 'edit'.", title="Error", style="red"))
-
-
-def handle_setup_command():
-    """Display the setup menu for managing configuration or installing dependencies."""
-    menu_text = (
-        "[bold]Setup Menu[/bold]\n"
-        "1) Manage config (view/edit vrip.ini)\n"
-        "2) Install dependencies (Linux)\n"
-        "3) Install dependencies (Windows)\n"
-        "4) Auto-detect and install dependencies\n"
-        "5) Return to main menu"
-    )
-    console.print(Panel(menu_text, title="Setup", style="cyan"))
-    choice = console.input("\nEnter choice: ").strip()
-
-    if choice == "1":
-        manage_settings_config()
-    elif choice == "2":
-        install_dependencies_linux(verbose=True)
-    elif choice == "3":
-        install_dependencies_windows(verbose=True)
-    elif choice == "4":
-        current_os = platform.system().lower()
-        console.print(
-            Panel(
-                f"Auto-detected OS: {current_os}",
-                title="Auto-detect",
-                style="yellow"
-            )
-        )
-        if "linux" in current_os:
-            install_dependencies_linux(verbose=True)
-        elif "windows" in current_os:
-            install_dependencies_windows(verbose=True)
-        else:
-            console.print(
-                Panel(
-                    "Unsupported OS or detection failed.",
-                    title="Error",
-                    style="red"
-                )
-            )
-    elif choice == "5":
-        return
-    else:
-        console.print(Panel("Invalid choice.", title="Error", style="red"))
-
-
-def handle_init_command():
-    """
-    Auto-detect OS, 'install dependencies', create or load vrip.ini,
-    and prompt for any missing details.
-    """
-    current_os = platform.system().lower()
-    console.print(Panel(f"Running 'init' command for OS = {current_os}",
-                        title="Init", style="blue"))
-
-    if "windows" in current_os:
-        install_dependencies_windows(verbose=True)
-    elif "linux" in current_os:
-        install_dependencies_linux(verbose=True)
-    else:
-        console.print(
-            Panel(
-                "Unsupported OS detected. Abort.",
-                title="Error",
-                style="red"
-            )
-        )
-        return
-
-    init_config()
-    validate_config()
-    console.print(
-        Panel(
-            "Initialization complete!",
-            title="Init",
-            style="green"
-        )
-    )
 
 
 def handle_man_command():
@@ -544,22 +640,18 @@ def handle_man_command():
       - Manages config via vrip.ini (stored on Windows in C:\\vrip_tools\\, or on Linux in ~/programs/vrip-ini/).
       - Installs dependencies if needed.
       - Downloads podcast episodes from an RSS feed, optionally filtering by title.
+      - Lets you pick whether to download oldest or newest first, skipping already-downloaded episodes.
 
-[bold cyan]MENU OPTIONS[/bold cyan]
-    1) init - Auto-detect OS, install dependencies, and configure vrip.ini.
-    2) setup - Manually install dependencies or manage vrip.ini (view/edit).
-    3) download - Download audio from a podcast RSS feed (with optional search term).
-    4) man - Display this manual.
-    5) exit - Quit the tool.
-
-[bold cyan]CONFIGURATION[/bold cyan]
-    [system]
-    os = windows or linux
-    default_output_dir = (Where your downloads go by default)
-
-    [logging]
-    log_dir = (Where your logs are stored)
-    log_level = INFO (Default logging level)
+[bold cyan]USAGE[/bold cyan]
+    1) Download from RSS
+       - Provide feed URL, number of episodes to download, and specify oldest/newest order.
+       - Provide a search term to filter episodes by title (optional).
+    2) Settings
+       - "init" to auto-install deps and create config
+       - "install dependencies" to do it manually
+       - "manage config" to view or edit vrip.ini
+    3) Manual & About
+       - This help text, plus version info
 
 [bold cyan]VERSION[/bold cyan]
     {VERSION}
@@ -573,77 +665,91 @@ def handle_man_command():
     console.print(Panel(manual_text, title="Manual", style="white"))
 
 
-def handle_download_command():
-    """Present a menu to download from a podcast RSS."""
-    console.print(
-        Panel(
+####################
+#  DOWNLOAD MENU   #
+####################
+
+def menu_download():
+    """
+    Menu to handle downloading from a podcast RSS.
+    """
+    while True:
+        menu_text = (
             "[bold]Download Menu[/bold]\n"
             "1) Download from podcast RSS\n"
-            "2) Return to main menu",
-            title="Download",
-            style="cyan"
+            "2) Return to main menu"
         )
-    )
-    choice = console.input("\nEnter choice: ").strip()
+        console.print(Panel(menu_text, title="Download", style="cyan"))
+        choice = console.input("\nEnter choice: ").strip()
 
-    # Load default output dir from config
-    config, _ = init_config()
-    default_download_dir = config["system"].get("default_output_dir", "")
+        # Load default output dir from config
+        config, _ = init_config()
+        default_download_dir = config["system"].get("default_output_dir", "")
 
-    if choice == "1":
-        rss_url = console.input("Enter RSS URL (e.g. https://site/feed.xml): ").strip()
-        if not rss_url:
-            console.print(Panel("Invalid RSS URL. Returning to menu.", title="Error", style="red"))
-            return
+        if choice == "1":
+            rss_url = console.input("Enter RSS URL (e.g. https://site/feed.xml): ").strip()
+            if not rss_url:
+                console.print(Panel("Invalid RSS URL. Returning to menu.", title="Error", style="red"))
+                continue
 
-        count_str = console.input("How many recent episodes to download? (Leave blank for all): ").strip()
-        try:
-            count = int(count_str) if count_str else None
-        except ValueError:
-            console.print(Panel("Invalid number, ignoring.", title="Warning", style="red"))
-            count = None
+            # Do you want oldest or newest first?
+            oldest_first = console.input("Download oldest first? (y/n): ").strip().lower() == 'y'
 
-        search_by = console.input("Enter search term for titles (leave blank for no filter): ").strip()
-        directory = console.input(
-            f"Enter output directory [default: {default_download_dir}]: ").strip() or default_download_dir
-        ensure_output_dir(directory)
+            count_str = console.input("How many episodes to download? (Leave blank for all): ").strip()
+            try:
+                count = int(count_str) if count_str else None
+            except ValueError:
+                console.print(Panel("Invalid number, ignoring.", title="Warning", style="red"))
+                count = None
 
-        enable_logging = console.input("Enable session logging? (y/n): ").strip().lower() == 'y'
-        verbose = console.input("Enable verbose output? (y/n): ").strip().lower() == 'y'
-        if enable_logging:
-            setup_logging()
+            search_by = console.input("Enter search term for titles (leave blank for no filter): ").strip()
+            directory = console.input(
+                f"Enter output directory [default: {default_download_dir}]: ").strip() or default_download_dir
+            ensure_output_dir(directory)
 
-        download_podcast_rss(rss_url, directory, count=count, searchby=search_by, verbose=verbose)
+            enable_logging = console.input("Enable session logging? (y/n): ").strip().lower() == 'y'
+            verbose = console.input("Enable verbose output? (y/n): ").strip().lower() == 'y'
+            if enable_logging:
+                setup_logging()
 
-    elif choice == "2":
-        return
-    else:
-        console.print(Panel("Invalid choice.", title="Error", style="red"))
+            download_podcast_rss(
+                rss_url,
+                directory,
+                count=count,
+                searchby=search_by,
+                verbose=verbose,
+                oldest_first=oldest_first
+            )
+        elif choice == "2":
+            break
+        else:
+            console.print(Panel("Invalid choice.", title="Error", style="red"))
 
+
+####################
+#      MAIN        #
+####################
 
 def main():
     """Main menu loop."""
     while True:
         main_menu = (
             "[bold]Main Menu[/bold]\n"
-            "1) init (auto-detect OS, install deps, configure vrip.ini)\n"
-            "2) setup (manual config or dep install)\n"
-            "3) download (RSS)\n"
-            "4) man (help/manual)\n"
-            "5) exit"
+            "1) Download Podcasts\n"
+            "2) Settings\n"
+            "3) Manual & About\n"
+            "4) Exit"
         )
         console.print(Panel(main_menu, title="vrip", style="magenta"))
         choice = console.input("\nEnter choice: ").strip()
 
         if choice == "1":
-            handle_init_command()
+            menu_download()
         elif choice == "2":
-            handle_setup_command()
+            menu_settings()
         elif choice == "3":
-            handle_download_command()
+            menu_manual_about()
         elif choice == "4":
-            handle_man_command()
-        elif choice == "5":
             console.print(Panel("Exiting...", title="Goodbye", style="bold magenta"))
             break
         else:
