@@ -1,6 +1,7 @@
 import argparse
 import os
 from pathlib import Path
+
 from PIL import Image
 
 
@@ -48,10 +49,17 @@ def process_directory(input_dir, output_dir, format, truncate):
 def main():
     parser = argparse.ArgumentParser(description="Convert WebP files to PNG or JPEG.")
     parser.add_argument("input", help="Input file or directory containing .webp files")
-    parser.add_argument("-o", "--output", default=None, help="Output directory (default: same as input)")
+    parser.add_argument(
+        "-o", "--output", default=None, help="Output directory (default: same as input)"
+    )
     parser.add_argument("--png", action="store_true", help="Convert to PNG")
     parser.add_argument("--jpeg", action="store_true", help="Convert to JPEG")
-    parser.add_argument("-jc", "--junc", action="store_true", help="Truncate output filename to 10 characters")
+    parser.add_argument(
+        "-jc",
+        "--junc",
+        action="store_true",
+        help="Truncate output filename to 10 characters",
+    )
 
     args = parser.parse_args()
 
@@ -72,7 +80,9 @@ def main():
     elif input_path.is_file() and input_path.suffix.lower() == ".webp":
         convert_webp_to(input_path, output_dir, format, args.junc)
     else:
-        print("Error: Input must be a .webp file or a directory containing .webp files.")
+        print(
+            "Error: Input must be a .webp file or a directory containing .webp files."
+        )
 
 
 if __name__ == "__main__":

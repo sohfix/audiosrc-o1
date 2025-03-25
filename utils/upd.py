@@ -2,11 +2,12 @@
 
 import argparse
 import os
-import sys
 import shutil
 import stat
+import sys
 
 VERSION = "1.0.1"
+
 
 def make_executable(path):
     """
@@ -14,8 +15,16 @@ def make_executable(path):
     """
     current_mode = os.stat(path).st_mode
     # Grant read, write, execute (owner), and read, execute (group, others).
-    new_mode = current_mode | stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH
+    new_mode = (
+        current_mode
+        | stat.S_IRWXU
+        | stat.S_IRGRP
+        | stat.S_IXGRP
+        | stat.S_IROTH
+        | stat.S_IXOTH
+    )
     os.chmod(path, new_mode)
+
 
 def copy_and_chmod(src_file, dist_dir, remove_py_ext=True, verbose=False):
     """
@@ -38,6 +47,7 @@ def copy_and_chmod(src_file, dist_dir, remove_py_ext=True, verbose=False):
     if verbose:
         print(f"Copied '{src_file}' -> '{dest_path}' [chmod 775]")
 
+
 def main():
     # Hard-coded distribution folder
     dist_dir = os.path.expandvars("$HOME/programs/distribution")
@@ -45,20 +55,33 @@ def main():
 
     parser = argparse.ArgumentParser(
         description="Copy Python files from a source directory into $HOME/programs/distribution, "
-                    "removing the .py extension and chmod 775."
+        "removing the .py extension and chmod 775."
     )
-    parser.add_argument("action",
-                        choices=["copy"],
-                        help="Action to perform (currently only 'copy' is supported).")
+    parser.add_argument(
+        "action",
+        choices=["copy"],
+        help="Action to perform (currently only 'copy' is supported).",
+    )
     # The source directory, default is the current directory
-    parser.add_argument("-d", "--dir", default=".",
-                        help="Source directory with .py files. Default is the current directory.")
-    parser.add_argument("--all", action="store_true",
-                        help="Automatically copy all .py files without asking.")
-    parser.add_argument("-V", "--version", action="store_true",
-                        help="Show the script version and exit.")
-    parser.add_argument("--verbose", action="store_true",
-                        help="Show verbose output (print each file copied).")
+    parser.add_argument(
+        "-d",
+        "--dir",
+        default=".",
+        help="Source directory with .py files. Default is the current directory.",
+    )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Automatically copy all .py files without asking.",
+    )
+    parser.add_argument(
+        "-V", "--version", action="store_true", help="Show the script version and exit."
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Show verbose output (print each file copied).",
+    )
 
     args = parser.parse_args()
 
@@ -77,8 +100,11 @@ def main():
 
         # Gather all .py files in the source directory
         files_in_source = os.listdir(source_dir)
-        py_files = [os.path.join(source_dir, f) for f in files_in_source
-                    if f.endswith(".py") and os.path.isfile(os.path.join(source_dir, f))]
+        py_files = [
+            os.path.join(source_dir, f)
+            for f in files_in_source
+            if f.endswith(".py") and os.path.isfile(os.path.join(source_dir, f))
+        ]
 
         if not py_files:
             print("No .py files found in the source directory.")
@@ -87,19 +113,27 @@ def main():
         if args.all:
             # Copy all .py files directly
             for py_file in py_files:
-                copy_and_chmod(py_file, dist_dir, remove_py_ext=True, verbose=args.verbose)
+                copy_and_chmod(
+                    py_file, dist_dir, remove_py_ext=True, verbose=args.verbose
+                )
         else:
             # Ask user which files to copy
-            print("Select which .py files you want to copy (comma-separated list of indices):\n")
+            print(
+                "Select which .py files you want to copy (comma-separated list of indices):\n"
+            )
             for i, filepath in enumerate(py_files):
                 print(f"  [{i}] {os.path.basename(filepath)}")
 
-            selected = input("\nEnter file indices (e.g. 0,2,4) or 'a' for all: ").strip()
+            selected = input(
+                "\nEnter file indices (e.g. 0,2,4) or 'a' for all: "
+            ).strip()
 
-            if selected.lower() == 'a':
+            if selected.lower() == "a":
                 # Copy all
                 for py_file in py_files:
-                    copy_and_chmod(py_file, dist_dir, remove_py_ext=True, verbose=args.verbose)
+                    copy_and_chmod(
+                        py_file, dist_dir, remove_py_ext=True, verbose=args.verbose
+                    )
             else:
                 try:
                     indices = [int(x) for x in selected.split(",")]
@@ -111,9 +145,15 @@ def main():
                     if idx < 0 or idx >= len(py_files):
                         print(f"Index {idx} is out of range. Skipping.")
                         continue
-                    copy_and_chmod(py_files[idx], dist_dir, remove_py_ext=True, verbose=args.verbose)
+                    copy_and_chmod(
+                        py_files[idx],
+                        dist_dir,
+                        remove_py_ext=True,
+                        verbose=args.verbose,
+                    )
 
         print("\nAll selected files have been processed.\n")
+
 
 if __name__ == "__main__":
     main()

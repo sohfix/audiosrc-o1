@@ -1,13 +1,13 @@
-import os
-import sys
 import json
-import shutil
 import logging
-import tkinter as tk
-from tkinter import ttk, messagebox
-import threading
-import queue
+import os
 import platform
+import queue
+import shutil
+import sys
+import threading
+import tkinter as tk
+from tkinter import messagebox, ttk
 
 # Global counters for backup statistics
 files_copied = 0
@@ -51,7 +51,9 @@ def ensure_config_dir():
         try:
             os.makedirs(CONFIG_DIR)
         except Exception as e:
-            messagebox.showerror("Configuration Error", f"Could not create configuration directory:\n{e}")
+            messagebox.showerror(
+                "Configuration Error", f"Could not create configuration directory:\n{e}"
+            )
             sys.exit(1)
 
 
@@ -63,24 +65,30 @@ def load_config():
     ensure_config_dir()
     default_config = {
         "source_folders": [os.path.expanduser("~/Documents")],
-        "backup_destination": "D:/Backup"
+        "backup_destination": "D:/Backup",
     }
     if not os.path.exists(CONFIG_FILE):
         try:
             with open(CONFIG_FILE, "w") as f:
                 json.dump(default_config, f, indent=4)
-            messagebox.showinfo("Configuration Created",
-                                f"Default config created at {CONFIG_FILE}.\nPlease review and update it as needed.")
+            messagebox.showinfo(
+                "Configuration Created",
+                f"Default config created at {CONFIG_FILE}.\nPlease review and update it as needed.",
+            )
             return default_config
         except Exception as e:
-            messagebox.showerror("Configuration Error", f"Error creating default config:\n{e}")
+            messagebox.showerror(
+                "Configuration Error", f"Error creating default config:\n{e}"
+            )
             sys.exit(1)
     else:
         try:
             with open(CONFIG_FILE, "r") as f:
                 return json.load(f)
         except Exception as e:
-            messagebox.showerror("Configuration Error", f"Error reading config file:\n{e}")
+            messagebox.showerror(
+                "Configuration Error", f"Error reading config file:\n{e}"
+            )
             sys.exit(1)
 
 
@@ -94,22 +102,27 @@ def validate_config(config):
     # Check each source folder
     for folder in config.get("source_folders", []):
         if not os.path.isdir(folder):
-            messagebox.showerror("Configuration Error",
-                                 f"Source folder does not exist:\n{folder}\nPlease update {CONFIG_FILE}.")
+            messagebox.showerror(
+                "Configuration Error",
+                f"Source folder does not exist:\n{folder}\nPlease update {CONFIG_FILE}.",
+            )
             valid = False
 
     # Check backup destination folder
     backup_dest = config.get("backup_destination", "")
     if not backup_dest:
-        messagebox.showerror("Configuration Error",
-                             f"No backup destination specified in {CONFIG_FILE}.")
+        messagebox.showerror(
+            "Configuration Error", f"No backup destination specified in {CONFIG_FILE}."
+        )
         valid = False
     elif not os.path.isdir(backup_dest):
         try:
             os.makedirs(backup_dest)
         except Exception as e:
-            messagebox.showerror("Configuration Error",
-                                 f"Backup destination folder could not be created:\n{backup_dest}\nError: {e}")
+            messagebox.showerror(
+                "Configuration Error",
+                f"Backup destination folder could not be created:\n{backup_dest}\nError: {e}",
+            )
             valid = False
 
     if not valid:
@@ -158,8 +171,16 @@ def backup_file(src_file, dest_file):
         errors_count += 1
     finally:
         files_processed += 1
-        progress_percent = int((files_processed / total_files) * 100) if total_files > 0 else 100
-        progress_queue.put(("update", progress_percent, f"Processed {files_processed} of {total_files} files."))
+        progress_percent = (
+            int((files_processed / total_files) * 100) if total_files > 0 else 100
+        )
+        progress_queue.put(
+            (
+                "update",
+                progress_percent,
+                f"Processed {files_processed} of {total_files} files.",
+            )
+        )
 
 
 def backup_folder(source_folder, backup_destination):
@@ -242,7 +263,9 @@ def run_backup_process(root, main_menu):
     progress_win.title("Backup Progress")
     progress_win.geometry("500x150")
 
-    progress_bar = ttk.Progressbar(progress_win, orient="horizontal", length=400, mode="determinate")
+    progress_bar = ttk.Progressbar(
+        progress_win, orient="horizontal", length=400, mode="determinate"
+    )
     progress_bar.pack(pady=20)
 
     status_label = tk.Label(progress_win, text="Starting backup...", padx=10)
@@ -256,12 +279,12 @@ def run_backup_process(root, main_menu):
                     percent = msg[1]
                     text = msg[2]
                     if percent is not None:
-                        progress_bar['value'] = percent
+                        progress_bar["value"] = percent
                     status_label.config(text=text)
                 elif msg[0] == "done":
                     percent = msg[1]
                     summary = msg[2]
-                    progress_bar['value'] = percent
+                    progress_bar["value"] = percent
                     status_label.config(text="Backup Completed")
                     show_summary_popup(progress_win, summary)
                     progress_win.destroy()
@@ -286,9 +309,11 @@ def auto_backup_trigger(root, main_menu):
     Function triggered by the auto-backup timer.
     Shows a confirmation popup; if approved, runs the backup process.
     """
-    answer = messagebox.askokcancel("Auto Backup",
-                                    "Scheduled backup is ready.\nDo you want to backup now?",
-                                    parent=root)
+    answer = messagebox.askokcancel(
+        "Auto Backup",
+        "Scheduled backup is ready.\nDo you want to backup now?",
+        parent=root,
+    )
     if answer:
         run_backup_process(root, main_menu)
     else:
@@ -307,7 +332,11 @@ def on_set_auto_backup(root, main_menu, interval_hours):
         return
     interval_ms = interval * 60 * 60 * 1000
     main_menu.pack_forget()
-    messagebox.showinfo("Auto Backup Scheduled", f"Auto backup scheduled in {interval} hour(s).", parent=root)
+    messagebox.showinfo(
+        "Auto Backup Scheduled",
+        f"Auto backup scheduled in {interval} hour(s).",
+        parent=root,
+    )
     root.after(interval_ms, auto_backup_trigger, root, main_menu)
 
 
@@ -321,7 +350,7 @@ def main():
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
-        handlers=[logging.StreamHandler()]
+        handlers=[logging.StreamHandler()],
     )
 
     root = tk.Tk()
@@ -334,8 +363,12 @@ def main():
     title_label = tk.Label(main_menu, text="Backup Application", font=("Arial", 16))
     title_label.pack(pady=10)
 
-    backup_now_btn = tk.Button(main_menu, text="Backup Now", width=20,
-                               command=lambda: on_backup_now(root, main_menu))
+    backup_now_btn = tk.Button(
+        main_menu,
+        text="Backup Now",
+        width=20,
+        command=lambda: on_backup_now(root, main_menu),
+    )
     backup_now_btn.pack(pady=5)
 
     auto_frame = tk.Frame(main_menu)
@@ -349,8 +382,11 @@ def main():
     interval_menu = tk.OptionMenu(auto_frame, interval_var, *interval_options)
     interval_menu.pack(side="left", padx=5)
 
-    auto_backup_btn = tk.Button(auto_frame, text="Set Auto Backup",
-                                command=lambda: on_set_auto_backup(root, main_menu, interval_var.get()))
+    auto_backup_btn = tk.Button(
+        auto_frame,
+        text="Set Auto Backup",
+        command=lambda: on_set_auto_backup(root, main_menu, interval_var.get()),
+    )
     auto_backup_btn.pack(side="left", padx=5)
 
     exit_btn = tk.Button(main_menu, text="Exit", width=20, command=root.quit)

@@ -1,14 +1,14 @@
-#OPTIMIZED FOR WINDOWS
+# OPTIMIZED FOR WINDOWS
 
-import os
-import sys
 import json
-import shutil
 import logging
-import tkinter as tk
-from tkinter import ttk, messagebox
-import threading
+import os
 import queue
+import shutil
+import sys
+import threading
+import tkinter as tk
+from tkinter import messagebox, ttk
 
 # Global counters for backup statistics
 files_copied = 0
@@ -31,7 +31,9 @@ def ensure_config_dir():
         try:
             os.makedirs(CONFIG_DIR)
         except Exception as e:
-            messagebox.showerror("Configuration Error", f"Could not create configuration directory:\n{e}")
+            messagebox.showerror(
+                "Configuration Error", f"Could not create configuration directory:\n{e}"
+            )
             sys.exit(1)
 
 
@@ -43,24 +45,30 @@ def load_config():
     ensure_config_dir()
     default_config = {
         "source_folders": [os.path.expanduser("~/Documents")],
-        "backup_destination": "D:/Backup"
+        "backup_destination": "D:/Backup",
     }
     if not os.path.exists(CONFIG_FILE):
         try:
             with open(CONFIG_FILE, "w") as f:
                 json.dump(default_config, f, indent=4)
-            messagebox.showinfo("Configuration Created",
-                                f"Default config created at {CONFIG_FILE}.\nPlease review and update it as needed.")
+            messagebox.showinfo(
+                "Configuration Created",
+                f"Default config created at {CONFIG_FILE}.\nPlease review and update it as needed.",
+            )
             return default_config
         except Exception as e:
-            messagebox.showerror("Configuration Error", f"Error creating default config:\n{e}")
+            messagebox.showerror(
+                "Configuration Error", f"Error creating default config:\n{e}"
+            )
             sys.exit(1)
     else:
         try:
             with open(CONFIG_FILE, "r") as f:
                 return json.load(f)
         except Exception as e:
-            messagebox.showerror("Configuration Error", f"Error reading config file:\n{e}")
+            messagebox.showerror(
+                "Configuration Error", f"Error reading config file:\n{e}"
+            )
             sys.exit(1)
 
 
@@ -74,22 +82,27 @@ def validate_config(config):
     # Check each source folder
     for folder in config.get("source_folders", []):
         if not os.path.isdir(folder):
-            messagebox.showerror("Configuration Error",
-                                 f"Source folder does not exist:\n{folder}\nPlease update {CONFIG_FILE}.")
+            messagebox.showerror(
+                "Configuration Error",
+                f"Source folder does not exist:\n{folder}\nPlease update {CONFIG_FILE}.",
+            )
             valid = False
 
     # Check backup destination folder
     backup_dest = config.get("backup_destination", "")
     if not backup_dest:
-        messagebox.showerror("Configuration Error",
-                             f"No backup destination specified in {CONFIG_FILE}.")
+        messagebox.showerror(
+            "Configuration Error", f"No backup destination specified in {CONFIG_FILE}."
+        )
         valid = False
     elif not os.path.isdir(backup_dest):
         try:
             os.makedirs(backup_dest)
         except Exception as e:
-            messagebox.showerror("Configuration Error",
-                                 f"Backup destination folder could not be created:\n{backup_dest}\nError: {e}")
+            messagebox.showerror(
+                "Configuration Error",
+                f"Backup destination folder could not be created:\n{backup_dest}\nError: {e}",
+            )
             valid = False
 
     if not valid:
@@ -134,8 +147,16 @@ def backup_file(src_file, dest_file):
     finally:
         files_processed += 1
         # Calculate and send progress update
-        progress_percent = int((files_processed / total_files) * 100) if total_files > 0 else 100
-        progress_queue.put(("update", progress_percent, f"Processed {files_processed} of {total_files} files."))
+        progress_percent = (
+            int((files_processed / total_files) * 100) if total_files > 0 else 100
+        )
+        progress_queue.put(
+            (
+                "update",
+                progress_percent,
+                f"Processed {files_processed} of {total_files} files.",
+            )
+        )
 
 
 def backup_folder(source_folder, backup_destination):
@@ -214,12 +235,12 @@ def update_progress(root, progress_bar, status_label):
                 percent = msg[1]
                 text = msg[2]
                 if percent is not None:
-                    progress_bar['value'] = percent
+                    progress_bar["value"] = percent
                 status_label.config(text=text)
             elif msg[0] == "done":
                 percent = msg[1]
                 summary = msg[2]
-                progress_bar['value'] = percent
+                progress_bar["value"] = percent
                 status_label.config(text="Backup Completed")
                 show_summary_popup(root, summary)
                 return
@@ -236,7 +257,9 @@ def show_summary_popup(root, summary):
     summary_win = tk.Toplevel(root)
     summary_win.title("Backup Summary")
     summary_win.geometry("400x200")
-    summary_label = tk.Label(summary_win, text=summary, justify="left", padx=10, pady=10)
+    summary_label = tk.Label(
+        summary_win, text=summary, justify="left", padx=10, pady=10
+    )
     summary_label.pack(expand=True, fill="both")
     ok_button = tk.Button(summary_win, text="OK", command=root.destroy)
     ok_button.pack(pady=10)
@@ -249,7 +272,7 @@ def main():
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
-        handlers=[logging.StreamHandler()]
+        handlers=[logging.StreamHandler()],
     )
 
     # Set up main Tkinter window
@@ -258,7 +281,9 @@ def main():
     root.geometry("500x150")
 
     # Progress bar widget
-    progress_bar = ttk.Progressbar(root, orient="horizontal", length=400, mode="determinate")
+    progress_bar = ttk.Progressbar(
+        root, orient="horizontal", length=400, mode="determinate"
+    )
     progress_bar.pack(pady=20)
 
     # Status label for current operation

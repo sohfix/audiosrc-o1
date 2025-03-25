@@ -5,8 +5,10 @@ import logging
 import sys
 import textwrap
 
+
 def print_manual():
-    manual = textwrap.dedent("""
+    manual = textwrap.dedent(
+        """
         oo7 - File Hash Verification Utility - INTEGRITY
         ========================================
 
@@ -85,20 +87,23 @@ def print_manual():
 
         VERSION
             oo7 version 1.0
-    """)
+    """
+    )
     print(manual)
+
 
 def calculate_hashes(filename):
     md5_hash = hashlib.md5()
     sha_hash = hashlib.sha1()
     try:
-        with open(filename, 'rb') as f:
+        with open(filename, "rb") as f:
             while chunk := f.read(4096):
                 md5_hash.update(chunk)
                 sha_hash.update(chunk)
     except FileNotFoundError:
         sys.exit(f"Error: File '{filename}' not found.")
     return md5_hash.hexdigest(), sha_hash.hexdigest()
+
 
 def main():
     # Check if the first argument is "man" to print the manual.
@@ -108,21 +113,27 @@ def main():
 
     parser = argparse.ArgumentParser(
         description="Verify MD5 and SHA1 hashes for a file.",
-        formatter_class=argparse.RawTextHelpFormatter
+        formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument("filename", help="File to verify")
     parser.add_argument("--md5", help="Expected MD5 hash value")
     parser.add_argument("--sha", help="Expected SHA1 hash value")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
-    parser.add_argument("-V", "--version", action="version", version="oo7.py version 1.0")
-    parser.add_argument("--logging", action="store_true", help="Enable logging to oo7.log")
+    parser.add_argument(
+        "-V", "--version", action="version", version="oo7.py version 1.0"
+    )
+    parser.add_argument(
+        "--logging", action="store_true", help="Enable logging to oo7.log"
+    )
 
     args = parser.parse_args()
 
     if args.logging:
-        logging.basicConfig(filename='oo7.log',
-                            level=logging.INFO,
-                            format='%(asctime)s - %(levelname)s - %(message)s')
+        logging.basicConfig(
+            filename="oo7.log",
+            level=logging.INFO,
+            format="%(asctime)s - %(levelname)s - %(message)s",
+        )
         logging.info("Logging enabled")
 
     if args.verbose:
@@ -155,6 +166,7 @@ def main():
             print("SHA1 mismatch!")
             if args.logging:
                 logging.error("SHA1 verification failed.")
+
 
 if __name__ == "__main__":
     main()
