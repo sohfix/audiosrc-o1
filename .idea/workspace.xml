@@ -5,65 +5,59 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="02d8744d-b7f7-4480-b809-6465d74964dd" name="Changes" comment="vrip 2.0.0 [Enhanced Update, Verbose Logging, Extended Server Info &amp; File Verification]&#10;&#10;A command‑line tool for downloading podcast episodes from RSS feeds.&#10;Features:&#10;  - Uses a configuration file (vrip.ini) to store user info and podcasts.&#10;  - Podcast list entries are stored as:&#10;        PODCAST_LINK : NAME_ID : OUTPUT_DIRECTORY&#10;  - Custom filename formats (default/daily).&#10;  - Verbose mode shows extended server info (via httpx), download speed, etc.&#10;  - Automatic timeout handling with exponential backoff and retry.&#10;  - Update feature now checks every episode and downloads missing ones.&#10;  - Optional SHA256 integrity hashing (sidecar .sha256 file) and verification.&#10;  - HTTPS‑only mode option.&#10;  - Rich table display, status panels with icons, clear banners, and Quiet Mode.&#10;  - Strong type hints and improved error logging.&#10;&#10;Refer to the manual (via the Manual &amp; About menu) for full details.">
-      <change afterPath="$PROJECT_DIR$/VRIP6.spec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP2/Analysis-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP2/EXE-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP2/PKG-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP2/PYZ-00.pyz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP2/PYZ-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP2/VRIP2.pkg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP2/base_library.zip" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP2/warn-VRIP2.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP2/xref-VRIP2.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP3/Analysis-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP3/EXE-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP3/PKG-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP3/PYZ-00.pyz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP3/PYZ-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP3/VRIP3.pkg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP3/base_library.zip" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP3/warn-VRIP3.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP3/xref-VRIP3.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP4/Analysis-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP4/EXE-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP4/PKG-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP4/PYZ-00.pyz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP4/PYZ-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP4/VRIP4.pkg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP4/base_library.zip" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP4/warn-VRIP4.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP4/xref-VRIP4.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP5/Analysis-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP5/EXE-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP5/PKG-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP5/PYZ-00.pyz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP5/PYZ-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP5/VRIP5.pkg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP5/base_library.zip" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP5/warn-VRIP5.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP5/xref-VRIP5.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP6/Analysis-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP6/EXE-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP6/PKG-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP6/PYZ-00.pyz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP6/PYZ-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP6/VRIP6.pkg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP6/base_library.zip" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP6/warn-VRIP6.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/VRIP6/xref-VRIP6.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dist/VRIP4.exe" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dist/VRIP6.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/audiosrc.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/audiosrc.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hl2-ci.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ih1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/copydeck_suite/copydeck.py" beforeDir="false" afterPath="$PROJECT_DIR$/copydeck_suite/copydeck.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/copydeck_suite/copydeck_enhance.py" beforeDir="false" afterPath="$PROJECT_DIR$/copydeck_suite/copydeck_enhance.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/flek.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/flek.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/oo7.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/oo7.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/retex.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/retex.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/upd.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/upd.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vrip.py" beforeDir="false" afterPath="$PROJECT_DIR$/vrip.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VRIP6.spec" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP2/Analysis-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP2/EXE-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP2/PKG-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP2/PYZ-00.pyz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP2/PYZ-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP2/VRIP2.pkg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP2/base_library.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP2/warn-VRIP2.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP2/xref-VRIP2.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP3/Analysis-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP3/EXE-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP3/PKG-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP3/PYZ-00.pyz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP3/PYZ-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP3/VRIP3.pkg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP3/base_library.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP3/warn-VRIP3.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP3/xref-VRIP3.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP4/Analysis-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP4/EXE-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP4/PKG-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP4/PYZ-00.pyz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP4/PYZ-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP4/VRIP4.pkg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP4/base_library.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP4/warn-VRIP4.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP4/xref-VRIP4.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP5/Analysis-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP5/EXE-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP5/PKG-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP5/PYZ-00.pyz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP5/PYZ-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP5/VRIP5.pkg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP5/base_library.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP5/warn-VRIP5.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP5/xref-VRIP5.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP6/Analysis-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP6/EXE-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP6/PKG-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP6/PYZ-00.pyz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP6/PYZ-00.toc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP6/VRIP6.pkg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP6/base_library.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP6/warn-VRIP6.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/VRIP6/xref-VRIP6.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/VRIP4.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/VRIP6.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vrip.py" beforeDir="false" afterPath="$PROJECT_DIR$/prx.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,39 +102,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.hiker.executor": "Run",
-    "Python.vrip.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "/home/sohfix/PycharmProjects/audiosrc",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.stylelint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.stylelint": "",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "run.code.analysis.last.selected.profile": "aDefault",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.hiker.executor&quot;: &quot;Run&quot;,
+    &quot;Python.vrip.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/sohfix/PycharmProjects/audiosrc&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.stylelint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.stylelint&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;aDefault&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\audiosrc-o1\dist" />
       <recent name="$PROJECT_DIR$/utils" />
       <recent name="$PROJECT_DIR$/copydeck_suite" />
       <recent name="$PROJECT_DIR$/hiker-src/books" />
     </key>
   </component>
   <component name="RunManager">
-    <configuration name="vrip" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="prx" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="audiosrc" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -154,7 +149,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/vrip.py" />
+      <option name="SCRIPT_NAME" value="C:\audiosrc-o1\prx.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -165,7 +160,7 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.vrip" />
+        <item itemvalue="Python.prx" />
       </list>
     </recent_temporary>
   </component>
@@ -200,7 +195,10 @@
       <workItem from="1742607188409" duration="20000" />
       <workItem from="1742767992251" duration="1512000" />
       <workItem from="1742771897085" duration="3440000" />
-      <workItem from="1742922223127" duration="6754000" />
+      <workItem from="1742922223127" duration="8315000" />
+      <workItem from="1742938340225" duration="9691000" />
+      <workItem from="1742965475335" duration="34000" />
+      <workItem from="1743001202536" duration="1192000" />
     </task>
     <task id="LOCAL-00001" summary="INIT">
       <option name="closed" value="true" />
@@ -322,7 +320,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742934424597</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="vrip 2.0.0 [Enhanced Update, Verbose Logging, Extended Server Info &amp; File Verification]&#10;&#10;A command‑line tool for downloading podcast episodes from RSS feeds.&#10;Features:&#10;  - Uses a configuration file (vrip.ini) to store user info and podcasts.&#10;  - Podcast list entries are stored as:&#10;        PODCAST_LINK : NAME_ID : OUTPUT_DIRECTORY&#10;  - Custom filename formats (default/daily).&#10;  - Verbose mode shows extended server info (via httpx), download speed, etc.&#10;  - Automatic timeout handling with exponential backoff and retry.&#10;  - Update feature now checks every episode and downloads missing ones.&#10;  - Optional SHA256 integrity hashing (sidecar .sha256 file) and verification.&#10;  - HTTPS‑only mode option.&#10;  - Rich table display, status panels with icons, clear banners, and Quiet Mode.&#10;  - Strong type hints and improved error logging.&#10;&#10;Refer to the manual (via the Manual &amp; About menu) for full details.">
+      <option name="closed" value="true" />
+      <created>1742934459706</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1742934459706</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
