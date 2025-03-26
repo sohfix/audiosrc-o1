@@ -32,11 +32,12 @@ SKIP_HASH = True
 #                          FILE PATH CONSTANTS                                #
 ###############################################################################
 CONFIG_PATH = r"C:\vrip_tools\vrip.ini"  # Storing user config
-DB_PATH = r"C:\vrip_tools\vrip_db.json"    # JSON DB (podcast file tracking)
+DB_PATH = r"C:\vrip_tools\vrip_db.json"  # JSON DB (podcast file tracking)
 
 ###############################################################################
 #                          CONFIG & LOGGING SETUP                             #
 ###############################################################################
+
 
 def load_config() -> configparser.ConfigParser:
     """Load vrip.ini or create a default if none exists."""
@@ -49,6 +50,7 @@ def load_config() -> configparser.ConfigParser:
         with open(CONFIG_PATH, "w") as f:
             config.write(f)
     return config
+
 
 def parse_podcast_list(config: configparser.ConfigParser) -> List[Tuple[str, str, str]]:
     """
@@ -67,7 +69,10 @@ def parse_podcast_list(config: configparser.ConfigParser) -> List[Tuple[str, str
             result.append((rss_link, name_id, out_dir))
     return result
 
-def write_podcast_list(config: configparser.ConfigParser, data: List[Tuple[str, str, str]]) -> None:
+
+def write_podcast_list(
+    config: configparser.ConfigParser, data: List[Tuple[str, str, str]]
+) -> None:
     """
     Write the list of (rss_link, name_id, output_dir) back to config as a semicolon-delimited string.
     """
@@ -77,9 +82,11 @@ def write_podcast_list(config: configparser.ConfigParser, data: List[Tuple[str, 
     with open(CONFIG_PATH, "w") as f:
         config.write(f)
 
+
 ###############################################################################
 #                         JSON DATABASE HELPERS                               #
 ###############################################################################
+
 
 def load_db() -> dict:
     """Load the JSON DB from DB_PATH, or return a blank structure if not found."""
@@ -88,11 +95,13 @@ def load_db() -> dict:
     with open(DB_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
 
+
 def save_db(db_data: dict) -> None:
     """Save the DB to DB_PATH as JSON."""
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     with open(DB_PATH, "w", encoding="utf-8") as f:
         json.dump(db_data, f, indent=2)
+
 
 def ensure_podcast_in_db(name_id: str) -> None:
     """Ensure the DB has a 'files' dict for this name_id."""
@@ -103,6 +112,7 @@ def ensure_podcast_in_db(name_id: str) -> None:
         db["podcasts"][name_id] = {"files": {}}
     save_db(db)
 
+
 def file_in_db(name_id: str, file_name: str) -> bool:
     """Check if file_name is recorded in DB for name_id."""
     db = load_db()
@@ -110,10 +120,12 @@ def file_in_db(name_id: str, file_name: str) -> bool:
         return False
     return file_name in db["podcasts"][name_id].get("files", {})
 
+
 def get_file_info(name_id: str, file_name: str) -> Optional[dict]:
     """Return the file's DB record or None."""
     db = load_db()
     return db["podcasts"].get(name_id, {}).get("files", {}).get(file_name)
+
 
 def remove_file_from_db(name_id: str, file_name: str) -> None:
     """Remove a file entry from the DB."""
@@ -124,7 +136,10 @@ def remove_file_from_db(name_id: str, file_name: str) -> None:
     except KeyError:
         pass
 
-def update_file_in_db(name_id: str, file_name: str, title: str, sha256_val: str, size_val: int) -> None:
+
+def update_file_in_db(
+    name_id: str, file_name: str, title: str, sha256_val: str, size_val: int
+) -> None:
     """Create/update a file entry in DB."""
     db = load_db()
     if "podcasts" not in db:
@@ -138,9 +153,11 @@ def update_file_in_db(name_id: str, file_name: str, title: str, sha256_val: str,
     }
     save_db(db)
 
+
 ###############################################################################
 #                       SCAN & SQUARE-UP DATABASE                             #
 ###############################################################################
+
 
 def compute_sha256(file_path: str) -> str:
     """
@@ -148,11 +165,13 @@ def compute_sha256(file_path: str) -> str:
     (This function is bypassed if SKIP_HASH is True.)
     """
     import hashlib
+
     hasher = hashlib.sha256()
     with open(file_path, "rb") as f:
         for chunk in iter(lambda: f.read(8192), b""):
             hasher.update(chunk)
     return hasher.hexdigest()
+
 
 def square_up_database(drive_path: str = r"G:\\") -> None:
     """
@@ -182,7 +201,9 @@ def square_up_database(drive_path: str = r"G:\\") -> None:
     for p_id, data in list(db["podcasts"].items()):
         file_dict = data.get("files", {})
         for fname in list(file_dict.keys()):
-            if (p_id not in physically_present) or (fname not in physically_present[p_id]):
+            if (p_id not in physically_present) or (
+                fname not in physically_present[p_id]
+            ):
                 remove_file_from_db(p_id, fname)
 
     for p_id, file_map in physically_present.items():
@@ -190,15 +211,21 @@ def square_up_database(drive_path: str = r"G:\\") -> None:
         for fname, info in file_map.items():
             if not file_in_db(p_id, fname):
                 sha_val = "" if SKIP_HASH else compute_sha256(info["full_path"])
-                update_file_in_db(p_id, fname, title=fname, sha256_val=sha_val, size_val=info["size"])
+                update_file_in_db(
+                    p_id, fname, title=fname, sha256_val=sha_val, size_val=info["size"]
+                )
 
     console.print(Panel("Database has been squared up with the drive.", style="green"))
+
 
 ###############################################################################
 #                           PODCAST UPDATE LOGIC                              #
 ###############################################################################
 
-def already_have_file(name_id: str, file_name: str, expected_size: Optional[int]) -> bool:
+
+def already_have_file(
+    name_id: str, file_name: str, expected_size: Optional[int]
+) -> bool:
     """
     Return True if we can skip download.
     """
@@ -208,6 +235,7 @@ def already_have_file(name_id: str, file_name: str, expected_size: Optional[int]
     if expected_size and info.get("size", 0) < expected_size:
         return False
     return True
+
 
 def download_file(url: str, dest: str) -> bool:
     """Download a file from url to dest. Returns True if success."""
@@ -222,6 +250,7 @@ def download_file(url: str, dest: str) -> bool:
     except Exception as e:
         console.print(Panel(f"Error downloading {url}\n{e}", style="red"))
         return False
+
 
 def update_podcast(name_id: str, rss_link: str, out_dir: str) -> None:
     """
@@ -289,9 +318,11 @@ def update_podcast(name_id: str, rss_link: str, out_dir: str) -> None:
         )
     )
 
+
 ###############################################################################
 #                            INTERACTIVE MENUS                                #
 ###############################################################################
+
 
 def menu_download():
     """
@@ -310,7 +341,9 @@ def menu_download():
         if choice == "1":
             plist = parse_podcast_list(config)
             if not plist:
-                console.print(Panel("No stored podcasts found. Add them first.", style="yellow"))
+                console.print(
+                    Panel("No stored podcasts found. Add them first.", style="yellow")
+                )
                 continue
             table = Table(title="Stored Podcasts")
             table.add_column("NAME_ID")
@@ -334,12 +367,15 @@ def menu_download():
                 console.print("No link entered.")
                 continue
             out_dir = console.input("Enter output directory (e.g. G:\\MyPod): ").strip()
-            name_id = console.input("Name this feed (any short ID): ").strip() or "custom"
+            name_id = (
+                console.input("Name this feed (any short ID): ").strip() or "custom"
+            )
             update_podcast(name_id, custom_rss, out_dir)
         elif choice == "3":
             break
         else:
             console.print(Panel("Invalid choice", style="red"))
+
 
 def menu_update():
     """
@@ -384,7 +420,9 @@ def menu_update():
             update_podcast(chosen_id, chosen_rss, chosen_out)
 
         elif choice == "3":
-            drive_path = console.input("Enter drive/folder to scan (default=G:\\): ").strip()
+            drive_path = console.input(
+                "Enter drive/folder to scan (default=G:\\): "
+            ).strip()
             if not drive_path:
                 drive_path = r"G:\\"
             square_up_database(drive_path)
@@ -392,6 +430,7 @@ def menu_update():
             break
         else:
             console.print(Panel("Invalid choice", style="red"))
+
 
 def menu_settings():
     """
@@ -436,7 +475,9 @@ def menu_settings():
                             t.add_row(rss, nid, outd)
                         console.print(t)
                 elif c2 == "2":
-                    new_line = console.input("Enter new (RSS_LINK : NAME_ID : OUTPUT_DIR): ").strip()
+                    new_line = console.input(
+                        "Enter new (RSS_LINK : NAME_ID : OUTPUT_DIR): "
+                    ).strip()
                     parts = [p.strip() for p in new_line.split(" : ")]
                     if len(parts) == 3:
                         rss, nameid, outd = parts
@@ -471,6 +512,7 @@ def menu_settings():
             break
         else:
             console.print(Panel("Invalid choice", style="red"))
+
 
 def menu_manual_about():
     """
@@ -508,9 +550,11 @@ Enjoy!
         else:
             console.print(Panel("Invalid choice", style="red"))
 
+
 ###############################################################################
 #                                     MAIN                                    #
 ###############################################################################
+
 
 def main():
     banner = "========== Welcome to vrip (3.0.0) =========="
@@ -537,6 +581,7 @@ def main():
             break
         else:
             console.print(Panel("Invalid choice.", style="red"))
+
 
 if __name__ == "__main__":
     main()
