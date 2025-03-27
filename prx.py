@@ -4,7 +4,7 @@ prx 2.2.0 [All Settings in INI + Window Resizing + Tolerance in MB]
 
 CHANGELOG:
   - All configurable settings are now read from the INI.
-  - The damaged-file tolerance is specified in MB (default: 5 MB).
+  - The damaged-file tolerance is specified in MB
   - Window size (width x height) is read from the INI and applied (Windows only).
   - You can change any setting (timeouts, retries, tolerance, window size, etc.) via the INI.
 """
@@ -13,7 +13,7 @@ import configparser
 import logging
 import os
 import re
-import shlex
+# import shlex
 import sys
 import time
 from datetime import datetime
@@ -74,7 +74,7 @@ def is_file_damaged(
     :param mp3_url: The URL for the MP3 (used for HEAD request if needed).
     :param tolerance: Tolerance in bytes (converted from MB setting) for size discrepancies.
     :param timeout: Timeout in seconds for HEAD requests.
-    :param do_head_if_needed: Whether to perform a HEAD request if enclosure_length is not valid.
+    #todo :param do_head_if_needed: Whether to perform a HEAD request if enclosure_length is not valid.
     :return: True if the file is determined to be damaged/incomplete.
     """
     if not os.path.exists(file_path):
@@ -102,7 +102,10 @@ def is_file_damaged(
     if remote_size is None:
         return False
 
-    if local_size < remote_size - tolerance:
+    # todo:
+    #
+    retol = remote_size - tolerance
+    if local_size < retol:
         return True
 
     return False

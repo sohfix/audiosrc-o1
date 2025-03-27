@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="02d8744d-b7f7-4480-b809-6465d74964dd" name="Changes" comment="prx 2.2.0 [All Settings in INI + Window Resizing + Tolerance in MB]&#10;&#10;CHANGELOG:&#10;  - All configurable settings are now read from the INI.&#10;  - The damaged-file tolerance is specified in MB (default: 5 MB).&#10;  - Window size (width x height) is read from the INI and applied (Windows only).&#10;  - You can change any setting (timeouts, retries, tolerance, window size, etc.) via the INI." />
+    <list default="true" id="02d8744d-b7f7-4480-b809-6465d74964dd" name="Changes" comment="prx 2.2.0 [All Settings in INI + Window Resizing + Tolerance in MB]&#10;&#10;CHANGELOG:&#10;  - All configurable settings are now read from the INI.&#10;  - The damaged-file tolerance is specified in MB (default: 5 MB).&#10;  - Window size (width x height) is read from the INI and applied (Windows only).&#10;  - You can change any setting (timeouts, retries, tolerance, window size, etc.) via the INI.">
+      <change afterPath="$PROJECT_DIR$/tdz.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/text.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prx.py" beforeDir="false" afterPath="$PROJECT_DIR$/prx.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -48,29 +53,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.hiker.executor&quot;: &quot;Run&quot;,
-    &quot;Python.vrip.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/sohfix/PycharmProjects/audiosrc&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.stylelint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.stylelint&quot;: &quot;&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;aDefault&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.hiker.executor": "Run",
+    "Python.vrip.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/audiosrc-o1",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.stylelint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.stylelint": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "run.code.analysis.last.selected.profile": "aDefault",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\audiosrc-o1" />
       <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -145,7 +151,8 @@
       <workItem from="1742938340225" duration="9691000" />
       <workItem from="1742965475335" duration="34000" />
       <workItem from="1743001202536" duration="2082000" />
-      <workItem from="1743037364416" duration="694000" />
+      <workItem from="1743037364416" duration="3659000" />
+      <workItem from="1743090472095" duration="2525000" />
     </task>
     <task id="LOCAL-00001" summary="INIT">
       <option name="closed" value="true" />
@@ -307,7 +314,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743038027079</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="prx 2.2.0 [All Settings in INI + Window Resizing + Tolerance in MB]&#10;&#10;CHANGELOG:&#10;  - All configurable settings are now read from the INI.&#10;  - The damaged-file tolerance is specified in MB (default: 5 MB).&#10;  - Window size (width x height) is read from the INI and applied (Windows only).&#10;  - You can change any setting (timeouts, retries, tolerance, window size, etc.) via the INI.">
+      <option name="closed" value="true" />
+      <created>1743038130263</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1743038130263</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
