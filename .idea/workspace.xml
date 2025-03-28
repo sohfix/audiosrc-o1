@@ -152,7 +152,7 @@
       <workItem from="1742965475335" duration="34000" />
       <workItem from="1743001202536" duration="2082000" />
       <workItem from="1743037364416" duration="3659000" />
-      <workItem from="1743090472095" duration="2525000" />
+      <workItem from="1743090472095" duration="2992000" />
     </task>
     <task id="LOCAL-00001" summary="INIT">
       <option name="closed" value="true" />
@@ -322,7 +322,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743038130263</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="prx 2.2.0 [All Settings in INI + Window Resizing + Tolerance in MB]&#10;&#10;CHANGELOG:&#10;  - All configurable settings are now read from the INI.&#10;  - The damaged-file tolerance is specified in MB (default: 5 MB).&#10;  - Window size (width x height) is read from the INI and applied (Windows only).&#10;  - You can change any setting (timeouts, retries, tolerance, window size, etc.) via the INI.">
+      <option name="closed" value="true" />
+      <created>1743101214677</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1743101214677</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
