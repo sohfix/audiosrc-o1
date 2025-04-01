@@ -42,7 +42,7 @@ DEFAULT_HTTPS_ONLY = False
 DEFAULT_TOLERANCE_MB = 10
 DEFAULT_WINDOW_WIDTH = 100
 DEFAULT_WINDOW_HEIGHT = 40
-DEFAULT_OUTPUT_DIR = r"G:\tdz"
+DEFAULT_OUTPUT_DIR = r"G:\TDZ"
 DEFAULT_LOG_DIR = r"G:\tools\logs"
 
 
@@ -731,15 +731,15 @@ def manage_settings_config() -> None:
     config, config_path = init_config()
     action = questionary.select(
         "What would you like to do in Settings?",
-        choices=["View prx.ini", "Edit user/password", "Edit advanced", "Return"],
+        choices=["View tdz-prx.ini", "Edit user/password", "Edit advanced", "Return"],
         style=custom_style
     ).ask()
 
-    if action == "View prx.ini":
+    if action == "View tdz-prx.ini":
         if os.path.exists(config_path):
             with open(config_path, "r") as cfile:
                 cdata = cfile.read()
-            console.print(Panel(cdata, title="prx.ini", style="blue"))
+            console.print(Panel(cdata, title="tdz-prx.ini", style="blue"))
         else:
             console.print(Panel("Couldn't find the config file.", style="red"))
 
