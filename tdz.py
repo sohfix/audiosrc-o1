@@ -42,8 +42,8 @@ DEFAULT_HTTPS_ONLY = False
 DEFAULT_TOLERANCE_MB = 10
 DEFAULT_WINDOW_WIDTH = 100
 DEFAULT_WINDOW_HEIGHT = 40
-DEFAULT_OUTPUT_DIR = r"F:\tdz"
-DEFAULT_LOG_DIR = r"F:\tools\logs"
+DEFAULT_OUTPUT_DIR = r"G:\tdz"
+DEFAULT_LOG_DIR = r"G:\tools\logs"
 
 
 ###############################################################################
@@ -71,12 +71,12 @@ custom_style = Style([
 
 def get_config_path() -> str:
     # This is where we keep our config file
-    return r"F:\tools\tdz-prx.ini"
+    return r"G:\tools\tdz-prx.ini"
 
 
 def init_config() -> Tuple[configparser.ConfigParser, str]:
     """
-    Check if we already have tdz-prx.ini in F:\tools\.
+    Check if we already have tdz-prx.ini in G:\tools\.
     If not, let's create a basic one so we can start with some defaults.
     """
     config_path = get_config_path()
@@ -972,8 +972,7 @@ def main() -> None:
         selection = questionary.select(
             "Main Menu:",
             choices=[
-                "Download Podcasts",
-                "Update Podcasts",
+                "Update TDZ",
                 "Browse Local Files",
                 "Settings",
                 "About",
@@ -985,16 +984,14 @@ def main() -> None:
         if selection == "Download Podcasts":
             menu_download()
 
-        elif selection == "Update Podcasts":
+        elif selection == "Update TDZ":
             choice = questionary.select(
                 "Update Options:",
-                choices=["Update All", "Update One", "Return"],
+                choices=["Update TDZ", "Return"],
                 style=custom_style
             ).ask()
-            if choice == "Update All":
+            if choice == "Update TDZ":
                 update_podcasts(all_update=True)
-            elif choice == "Update One":
-                update_podcasts(all_update=False)
             else:
                 pass
 

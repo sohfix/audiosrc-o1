@@ -39,8 +39,8 @@ DEFAULT_HTTPS_ONLY = False
 DEFAULT_TOLERANCE_MB = 5  # tolerance in MB (5 MB)
 DEFAULT_WINDOW_WIDTH = 120
 DEFAULT_WINDOW_HEIGHT = 30
-DEFAULT_OUTPUT_DIR = r"G:\tools\downloads"
-DEFAULT_LOG_DIR = r"G:\tools\logs"
+DEFAULT_OUTPUT_DIR = r"H:\tools\downloads"
+DEFAULT_LOG_DIR = r"H:\tools\logs"
 
 VERSION = "2.2.0 [All Settings in INI + Window Resizing + Tolerance in MB]"
 
@@ -169,8 +169,8 @@ def clear_screen() -> None:
 
 
 def get_config_path() -> str:
-    """Return the path to prx.ini on G:\."""
-    return r"G:\tools\prx.ini"
+    """Return the path to prx.ini on H:\."""
+    return r"H:\tools\prx.ini"
 
 
 def ensure_output_dir(output_dir: str) -> None:
@@ -184,7 +184,7 @@ def ensure_output_dir(output_dir: str) -> None:
 
 def init_config() -> Tuple[configparser.ConfigParser, str]:
     """
-    Load or create a default prx.ini at G:\tools\prx.ini.
+    Load or create a default prx.ini at H:\tools\prx.ini.
     This file contains all configurable settings.
     """
     config_path = get_config_path()
@@ -434,8 +434,8 @@ def parse_podcast_list(config: configparser.ConfigParser) -> List[Tuple[str, str
 
 
 def handle_init_command() -> None:
-    """Initialize config on G:\ and prompt for user info."""
-    console.print(Panel("Running init for G:\\ environment.", style="blue"))
+    """Initialize config on H:\ and prompt for user info."""
+    console.print(Panel("Running init for H:\\ environment.", style="blue"))
     config, _ = init_config()
     validate_config()
     set_window_size(config)
@@ -443,7 +443,7 @@ def handle_init_command() -> None:
 
 
 def manage_settings_config() -> None:
-    """View or edit prx.ini on G:\."""
+    """View or edit prx.ini on H:\."""
     config, config_path = init_config()
     console.print(Panel("Settings management.", style="blue"))
     action = console.input("Choose (view/edit): ").strip().lower()
