@@ -256,6 +256,7 @@ class PodcastManagerApp:
     def show_storage(self):
         for widget in self.storage_chart_frame.winfo_children():
             widget.destroy()
+
         drives = {}
         for data in self.podcasts.values():
             drive = os.path.splitdrive(data['output'])[0]
@@ -265,27 +266,38 @@ class PodcastManagerApp:
                     drives[drive] = (total, used, free)
                 except Exception:
                     drives[drive] = (0, 0, 0)
-        num_drives = len(drives)
-        fig = Figure(figsize=(6, 4*num_drives if num_drives > 0 else 4), dpi=100)
-        if num_drives > 0:
-            axs = fig.subplots(num_drives, 1) if num_drives > 1 else [fig.add_subplot(111)]
-        else:
-            axs = [fig.add_subplot(111)]
-            axs[0].text(0.5, 0.5, "No drives found", ha='center')
-        for ax, (drive, (total, used, free)) in zip(axs, drives.items()):
-            used_pct = used / total * 100 if total > 0 else 0
-            free_pct = free / total * 100 if total > 0 else 0
-            ax.pie([used_pct, free_pct],
-                   labels=[f"Used ({used_pct:.1f}%)", f"Free ({free_pct:.1f}%)"],
-                   autopct="%1.1f%%", startangle=90)
-            ax.set_title(f"Drive {drive}")
-            stats_text = f"Total: {format_bytes(total)}\nUsed: {format_bytes(used)}\nFree: {format_bytes(free)}"
-            ax.text(0.5, -0.15, stats_text, transform=ax.transAxes, ha="center", va="top", fontsize=10)
+
+        fig = Figure(figsize=(8, 1.5 * len(drives)), dpi=100)
+        ax = fig.add_subplot(111)
+
+        drive_labels = []
+        used_space = []
+        free_space = []
+
+        for drive, (total, used, free) in drives.items():
+            drive_labels.append(f"{drive} ({format_bytes(total)})")
+            used_space.append(used / (1024 ** 3))  # GB
+            free_space.append(free / (1024 ** 3))  # GB
+
+        ax.barh(drive_labels, used_space, color='#ff6666', label='Used Space (GB)')
+        ax.barh(drive_labels, free_space, left=used_space, color='#66b3ff', label='Free Space (GB)')
+
+        for i, (u, f) in enumerate(zip(used_space, free_space)):
+            ax.text(u / 2, i, f"{u:.1f} GB Used", va='center', ha='center', color='white', fontsize=8,
+                    fontweight='bold')
+            ax.text(u + f / 2, i, f"{f:.1f} GB Free", va='center', ha='center', color='black', fontsize=8,
+                    fontweight='bold')
+
+        ax.set_xlabel('Storage (GB)')
+        ax.set_title('Drive Storage Usage')
+        ax.legend()
+        ax.grid(axis='x', linestyle='--', alpha=0.5)
+
         fig.tight_layout()
+
         canvas = FigureCanvasTkAgg(fig, master=self.storage_chart_frame)
         canvas.draw()
         canvas.get_tk_widget().pack(fill="both", expand=True)
-
 
     def search_playlist(self):
         query = self.search_var.get().strip().lower()
@@ -404,12 +416,15 @@ class PodcastManagerApp:
         self.user_listbox = tk.Listbox(frame, height=6)
         self.user_listbox.pack(fill="x", padx=5, pady=5)
         self.refresh_user_list()
-        btn_frame = ttk.Frame(frame)
-        btn_frame.pack(pady=5)
-        ttk.Button(btn_frame, text="Add User", command=self.add_user).grid(row=0, column=0, padx=5)
-        ttk.Button(btn_frame, text="Edit User", command=self.edit_user).grid(row=0, column=1, padx=5)
-        ttk.Button(btn_frame, text="Remove User", command=self.remove_user).grid(row=0, column=2, padx=5)
-        ttk.Button(btn_frame, text="Refresh", command=self.refresh_user_list).grid(row=0, column=3, padx=5)
+        controls_frame = ttk.Frame(frame)
+        controls_frame.pack(pady=10)
+
+        # Larger and clearer Unicode symbols
+        ttk.Button(controls_frame, text="⏪ 15s", width=8, command=self.skip_backward).grid(row=0, column=0, padx=5)
+        ttk.Button(controls_frame, text="► Play", width=8, command=self.play_audio).grid(row=0, column=1, padx=5)
+        ttk.Button(controls_frame, text="⏸ Pause", width=8, command=self.pause_audio).grid(row=0, column=2, padx=5)
+        ttk.Button(controls_frame, text="■ Stop", width=8, command=self.stop_audio).grid(row=0, column=3, padx=5)
+        ttk.Button(controls_frame, text="15s ⏩", width=8, command=self.skip_forward).grid(row=0, column=4, padx=5)
 
     def refresh_user_list(self):
         user_config = configparser.ConfigParser()
