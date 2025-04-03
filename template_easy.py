@@ -28,7 +28,7 @@ TDZ_FEED_URL = (
     "e73c998e-6e60-432f-8610-ae210140c5b1/39e934d7-2ddc-4b3e-bc73-ae2b00156363/"
     "ab6037f4-9a9a-449b-915d-ae2b00156375/podcast.rss"
 )
-OUTPUT_DIR = r"G:\TDZ"
+OUTPUT_DIR = r"I:\TDZ"
 
 HTTP_TIMEOUT = 10
 MAX_RETRIES = 3
