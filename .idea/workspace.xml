@@ -4,21 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="02d8744d-b7f7-4480-b809-6465d74964dd" name="Changes" comment="refactor: migrate to questionary/curses UI, make config path dynamic via env var&#10;&#10;- Replaced outdated menu system with questionary for modern interactive prompts&#10;- Added optional curses-based window resizing for Windows&#10;- Made config and output paths dynamic via PRX_BASE_DIR env variable&#10;- Refactored config handling, download logic, and menus into modular functions&#10;- Improved readability, maintainability, and user experience across the app">
-      <change afterPath="$PROJECT_DIR$/copydeck_suite/remo.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pod_project_alpha.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pod_project_tester.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pod_project_tester2.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/podder.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/retired/pod-pulls/POD_TEMPLATE.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/retired/pod-pulls/tdz.pyw" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/audiosrc.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/audiosrc.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="02d8744d-b7f7-4480-b809-6465d74964dd" name="Changes" comment="PODMASTER V1&#10;&#10;feat: Implement advanced playback and metrics features&#10;&#10;- Added skip forward/backward (15s) controls, playlist management, and MP3 title search.&#10;- Integrated album art extraction for MP3 files in the player tab.&#10;- Introduced usage metrics tracking (played episodes logged to CSV) with a dedicated Metrics tab.&#10;- Enhanced UI with detailed per-file download progress (speed, file size, percentage) and custom styled progress bars.&#10;- Added multi-user support with login, user-specific podcast configurations, and an admin panel for user management.&#10;- Maintained existing functionality (podcast download, storage visualization, activity logging) with improvements.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prx.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/docs/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tdz.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/text.py" beforeDir="false" afterPath="$PROJECT_DIR$/copydeck_suite/text.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PodMaster.py" beforeDir="false" afterPath="$PROJECT_DIR$/PodMaster.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,6 +53,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Python.PodMaster.executor": "Run",
     "Python.hiker.executor": "Run",
     "Python.prx.pyw.executor": "Run",
     "Python.remo.executor": "Run",
@@ -101,7 +90,30 @@
       <recent name="C:\audiosrc-o1\copydeck_suite" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.remo">
+  <component name="RunManager" selected="Python.PodMaster">
+    <configuration name="PodMaster" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="audiosrc" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/PodMaster.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="prx" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="audiosrc" />
       <option name="ENV_FILES" value="" />
@@ -196,6 +208,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.PodMaster" />
         <item itemvalue="Python.remo" />
         <item itemvalue="Python.tdz.pyw" />
         <item itemvalue="Python.prx.pyw" />
@@ -251,7 +264,7 @@
       <workItem from="1743637680401" duration="5414000" />
       <workItem from="1743643283000" duration="67000" />
       <workItem from="1743644246356" duration="3048000" />
-      <workItem from="1743691481493" duration="6297000" />
+      <workItem from="1743691481493" duration="8751000" />
     </task>
     <task id="LOCAL-00001" summary="INIT">
       <option name="closed" value="true" />
@@ -461,7 +474,23 @@
       <option name="project" value="LOCAL" />
       <updated>1743620189804</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="PODMASTER V1&#10;&#10;feat: Implement advanced playback and metrics features&#10;&#10;- Added skip forward/backward (15s) controls, playlist management, and MP3 title search.&#10;- Integrated album art extraction for MP3 files in the player tab.&#10;- Introduced usage metrics tracking (played episodes logged to CSV) with a dedicated Metrics tab.&#10;- Enhanced UI with detailed per-file download progress (speed, file size, percentage) and custom styled progress bars.&#10;- Added multi-user support with login, user-specific podcast configurations, and an admin panel for user management.&#10;- Maintained existing functionality (podcast download, storage visualization, activity logging) with improvements.">
+      <option name="closed" value="true" />
+      <created>1743700282913</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1743700282913</updated>
+    </task>
+    <task id="LOCAL-00028" summary="PODMASTER V1&#10;&#10;feat: Implement advanced playback and metrics features&#10;&#10;- Added skip forward/backward (15s) controls, playlist management, and MP3 title search.&#10;- Integrated album art extraction for MP3 files in the player tab.&#10;- Introduced usage metrics tracking (played episodes logged to CSV) with a dedicated Metrics tab.&#10;- Enhanced UI with detailed per-file download progress (speed, file size, percentage) and custom styled progress bars.&#10;- Added multi-user support with login, user-specific podcast configurations, and an admin panel for user management.&#10;- Maintained existing functionality (podcast download, storage visualization, activity logging) with improvements.">
+      <option name="closed" value="true" />
+      <created>1743700292342</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1743700292342</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -490,13 +519,15 @@
     <MESSAGE value="prx 2.2.0 [All Settings in INI + Window Resizing + Tolerance in MB]&#10;&#10;CHANGELOG:&#10;  - All configurable settings are now read from the INI.&#10;  - The damaged-file tolerance is specified in MB (default: 5 MB).&#10;  - Window size (width x height) is read from the INI and applied (Windows only).&#10;  - You can change any setting (timeouts, retries, tolerance, window size, etc.) via the INI." />
     <MESSAGE value="fixed some stuff" />
     <MESSAGE value="refactor: migrate to questionary/curses UI, make config path dynamic via env var&#10;&#10;- Replaced outdated menu system with questionary for modern interactive prompts&#10;- Added optional curses-based window resizing for Windows&#10;- Made config and output paths dynamic via PRX_BASE_DIR env variable&#10;- Refactored config handling, download logic, and menus into modular functions&#10;- Improved readability, maintainability, and user experience across the app" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: migrate to questionary/curses UI, make config path dynamic via env var&#10;&#10;- Replaced outdated menu system with questionary for modern interactive prompts&#10;- Added optional curses-based window resizing for Windows&#10;- Made config and output paths dynamic via PRX_BASE_DIR env variable&#10;- Refactored config handling, download logic, and menus into modular functions&#10;- Improved readability, maintainability, and user experience across the app" />
+    <MESSAGE value="PODMASTER V1&#10;&#10;feat: Implement advanced playback and metrics features&#10;&#10;- Added skip forward/backward (15s) controls, playlist management, and MP3 title search.&#10;- Integrated album art extraction for MP3 files in the player tab.&#10;- Introduced usage metrics tracking (played episodes logged to CSV) with a dedicated Metrics tab.&#10;- Enhanced UI with detailed per-file download progress (speed, file size, percentage) and custom styled progress bars.&#10;- Added multi-user support with login, user-specific podcast configurations, and an admin panel for user management.&#10;- Maintained existing functionality (podcast download, storage visualization, activity logging) with improvements." />
+    <option name="LAST_COMMIT_MESSAGE" value="PODMASTER V1&#10;&#10;feat: Implement advanced playback and metrics features&#10;&#10;- Added skip forward/backward (15s) controls, playlist management, and MP3 title search.&#10;- Integrated album art extraction for MP3 files in the player tab.&#10;- Introduced usage metrics tracking (played episodes logged to CSV) with a dedicated Metrics tab.&#10;- Enhanced UI with detailed per-file download progress (speed, file size, percentage) and custom styled progress bars.&#10;- Added multi-user support with login, user-specific podcast configurations, and an admin panel for user management.&#10;- Maintained existing functionality (podcast download, storage visualization, activity logging) with improvements." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/audiosrc$vrip.coverage" NAME="vrip Coverage Results" MODIFIED="1739933637539" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/audiosrc_o1$prx_pyw.coverage" NAME="prx.pyw Coverage Results" MODIFIED="1743623392869" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/audiosrc_o1$remo.coverage" NAME="remo Coverage Results" MODIFIED="1743636131249" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/copydeck_suite" />
     <SUITE FILE_PATH="coverage/audiosrc_o1$tdz_pyw.coverage" NAME="tdz.pyw Coverage Results" MODIFIED="1743623941078" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/audiosrc_o1$PodMaster.coverage" NAME="PodMaster Coverage Results" MODIFIED="1743702352772" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/audiosrc$hiker.coverage" NAME="hiker Coverage Results" MODIFIED="1740174632963" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/hiker-src" />
   </component>
 </project>

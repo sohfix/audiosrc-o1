@@ -25,7 +25,7 @@ from matplotlib.figure import Figure
 # Constants for config file paths
 CONFIG_DIR = r'C:\tools\config'
 USERS_CONFIG_PATH = os.path.join(CONFIG_DIR, 'users.ini')
-DEFAULT_TOLERANCE_MB = 5
+DEFAULT_TOLERANCE_MB = 7
 
 def format_bytes(num_bytes):
     """Return a human-friendly string for bytes (in GB, MB, KB, or B)."""
@@ -77,7 +77,7 @@ class PodcastManagerApp:
         self.root = root
         self.username = username
         self.root.title(f"Podcast Manager - User: {self.username}")
-        self.root.geometry("800x600")
+        self.root.geometry("840x600")
         self.stop_flag = False
         self.switch_user_requested = False
         # For usage metrics file
@@ -141,7 +141,7 @@ class PodcastManagerApp:
         self.file_progress_label.pack(side="left", padx=10)
         ttk.Button(status_frame, text="Stop After Next Download", command=self.set_stop_flag).pack(side="left", padx=10)
         ttk.Button(status_frame, text="Switch User", command=self.switch_user).pack(side="left", padx=10)
-        # NOTEBOOK FOR TABS BELOW:
+        # NOTEBOOK FOR TABS BELOW THE STATUS BAR:
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(fill="both", expand=True)
         # Podcasts Tab
@@ -195,14 +195,14 @@ class PodcastManagerApp:
         pl_btn_frame.pack(pady=5)
         ttk.Button(pl_btn_frame, text="Add File", command=self.add_to_playlist).grid(row=0, column=0, padx=5)
         ttk.Button(pl_btn_frame, text="Remove Selected", command=self.remove_selected_playlist_item).grid(row=0, column=1, padx=5)
-        # Search by MP3 title (searches the current playlist)
+        # Search by MP3 title
         search_frame = ttk.Frame(frame)
         search_frame.pack(pady=5)
         ttk.Label(search_frame, text="Search Title:").grid(row=0, column=0, padx=5)
         self.search_var = tk.StringVar()
         ttk.Entry(search_frame, textvariable=self.search_var, width=30).grid(row=0, column=1, padx=5)
         ttk.Button(search_frame, text="Search", command=self.search_playlist).grid(row=0, column=2, padx=5)
-        # Playback control buttons with icons (using Unicode)
+        # Playback controls with skip buttons and icons
         controls_frame = ttk.Frame(frame)
         controls_frame.pack(pady=10)
         ttk.Button(controls_frame, text="⏪ 15s", command=self.skip_backward).grid(row=0, column=0, padx=5)
@@ -210,7 +210,7 @@ class PodcastManagerApp:
         ttk.Button(controls_frame, text="⏸", command=self.pause_audio, width=5).grid(row=0, column=2, padx=5)
         ttk.Button(controls_frame, text="■", command=self.stop_audio, width=5).grid(row=0, column=3, padx=5)
         ttk.Button(controls_frame, text="15s ⏩", command=self.skip_forward).grid(row=0, column=4, padx=5)
-        # Volume slider remains as before
+        # Volume slider
         vol_frame = ttk.Frame(frame)
         vol_frame.pack(pady=5)
         ttk.Label(vol_frame, text="Volume:").pack(side="left")
@@ -246,6 +246,47 @@ class PodcastManagerApp:
             title, filepath = self.playlist[idx]
             self.load_audio_file(filepath)
 
+    # ------------------ Storage Tab ------------------
+    def build_storage_tab(self, parent):
+        ttk.Button(parent, text="Refresh Storage Info", command=self.show_storage).pack(pady=5)
+        self.storage_chart_frame = ttk.Frame(parent)
+        self.storage_chart_frame.pack(fill="both", expand=True)
+        self.show_storage()
+
+    def show_storage(self):
+        for widget in self.storage_chart_frame.winfo_children():
+            widget.destroy()
+        drives = {}
+        for data in self.podcasts.values():
+            drive = os.path.splitdrive(data['output'])[0]
+            if drive not in drives:
+                try:
+                    total, used, free = shutil.disk_usage(drive + os.sep)
+                    drives[drive] = (total, used, free)
+                except Exception:
+                    drives[drive] = (0, 0, 0)
+        num_drives = len(drives)
+        fig = Figure(figsize=(6, 4*num_drives if num_drives > 0 else 4), dpi=100)
+        if num_drives > 0:
+            axs = fig.subplots(num_drives, 1) if num_drives > 1 else [fig.add_subplot(111)]
+        else:
+            axs = [fig.add_subplot(111)]
+            axs[0].text(0.5, 0.5, "No drives found", ha='center')
+        for ax, (drive, (total, used, free)) in zip(axs, drives.items()):
+            used_pct = used / total * 100 if total > 0 else 0
+            free_pct = free / total * 100 if total > 0 else 0
+            ax.pie([used_pct, free_pct],
+                   labels=[f"Used ({used_pct:.1f}%)", f"Free ({free_pct:.1f}%)"],
+                   autopct="%1.1f%%", startangle=90)
+            ax.set_title(f"Drive {drive}")
+            stats_text = f"Total: {format_bytes(total)}\nUsed: {format_bytes(used)}\nFree: {format_bytes(free)}"
+            ax.text(0.5, -0.15, stats_text, transform=ax.transAxes, ha="center", va="top", fontsize=10)
+        fig.tight_layout()
+        canvas = FigureCanvasTkAgg(fig, master=self.storage_chart_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill="both", expand=True)
+
+
     def search_playlist(self):
         query = self.search_var.get().strip().lower()
         self.playlist_listbox.delete(0, tk.END)
@@ -254,7 +295,6 @@ class PodcastManagerApp:
                 self.playlist_listbox.insert(tk.END, title)
 
     def load_audio_file(self, filepath=None):
-        # If no filepath is passed, open file dialog
         if not filepath:
             filepath = filedialog.askopenfilename(title="Select Audio File",
                                                   filetypes=[("Audio Files", "*.mp3 *.wav *.m4a *.ogg")])
@@ -264,7 +304,6 @@ class PodcastManagerApp:
             self.current_episode = filepath
             self.play_start_time = time.time()
             self.log(f"Loaded file: {os.path.basename(filepath)}")
-            # Try to load album art for mp3
             if filepath.lower().endswith('.mp3'):
                 try:
                     tags = ID3(filepath)
@@ -296,7 +335,6 @@ class PodcastManagerApp:
     def stop_audio(self):
         self.media_player.stop()
         self.log("Audio stopped.")
-        # If an episode was playing and played >30s, log it to metrics.
         if self.current_episode and self.play_start_time:
             played_duration = time.time() - self.play_start_time
             if played_duration > 30:
@@ -314,7 +352,7 @@ class PodcastManagerApp:
 
     def skip_forward(self):
         current_time = self.media_player.get_time()
-        self.media_player.set_time(current_time + 15000)  # +15 seconds
+        self.media_player.set_time(current_time + 15000)
         self.log("Skipped forward 15 seconds.")
 
     def skip_backward(self):
@@ -354,7 +392,7 @@ class PodcastManagerApp:
         if os.path.exists(self.metrics_file):
             with open(self.metrics_file, 'r', newline='') as f:
                 reader = csv.reader(f)
-                next(reader, None)  # skip header
+                next(reader, None)
                 for row in reader:
                     self.metrics_tree.insert("", tk.END, values=row)
 
@@ -502,47 +540,102 @@ class PodcastManagerApp:
             chk.grid(row=idx, column=0, sticky="w", padx=2, pady=2)
             self.check_vars[name] = var
 
-    # ------------------ Storage Tab ------------------
-    def build_storage_tab(self, parent):
-        ttk.Button(parent, text="Refresh Storage Info", command=self.show_storage).pack(pady=5)
-        self.storage_chart_frame = ttk.Frame(parent)
-        self.storage_chart_frame.pack(fill="both", expand=True)
-        self.show_storage()
+    # ------------------ Podcasts Management Methods ------------------
+    def open_add_podcast_dialog(self):
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Add Podcast")
+        dialog.geometry("400x200+150+100")
+        dialog.resizable(False, False)
+        name_var = tk.StringVar()
+        url_var = tk.StringVar()
+        output_var = tk.StringVar()
+        ttk.Label(dialog, text="Podcast Name:").pack(pady=2, padx=10, anchor="w")
+        ttk.Entry(dialog, textvariable=name_var, width=50).pack(pady=2, padx=10)
+        ttk.Label(dialog, text="RSS Feed URL:").pack(pady=2, padx=10, anchor="w")
+        ttk.Entry(dialog, textvariable=url_var, width=50).pack(pady=2, padx=10)
+        def choose_output():
+            path = filedialog.askdirectory(title="Select Output Directory")
+            if path:
+                output_var.set(path)
+        folder_frame = ttk.Frame(dialog)
+        folder_frame.pack(pady=2, padx=10, fill="x")
+        ttk.Label(folder_frame, text="Output Folder:").pack(side="left")
+        ttk.Entry(folder_frame, textvariable=output_var, width=35).pack(side="left", padx=3)
+        ttk.Button(folder_frame, text="Browse", command=choose_output).pack(side="left")
+        btn_frame = ttk.Frame(dialog)
+        btn_frame.pack(pady=10)
+        def on_ok():
+            n = name_var.get().strip()
+            u = url_var.get().strip()
+            o = output_var.get().strip()
+            if n and u and o:
+                self.config[n] = {'url': u, 'output': o}
+                self.podcasts[n] = {'url': u, 'output': o}
+                self.save_config()
+                self.refresh_list()
+            dialog.destroy()
+        ttk.Button(btn_frame, text="OK", command=on_ok).pack(side="left", padx=5)
+        ttk.Button(btn_frame, text="Cancel", command=dialog.destroy).pack(side="left", padx=5)
+        dialog.wait_window(dialog)
 
-    def show_storage(self):
-        for widget in self.storage_chart_frame.winfo_children():
-            widget.destroy()
-        drives = {}
-        for data in self.podcasts.values():
-            drive = os.path.splitdrive(data['output'])[0]
-            if drive not in drives:
-                try:
-                    total, used, free = shutil.disk_usage(drive + os.sep)
-                    drives[drive] = (total, used, free)
-                except Exception:
-                    drives[drive] = (0, 0, 0)
-        num_drives = len(drives)
-        fig = Figure(figsize=(6, 4*num_drives if num_drives > 0 else 4), dpi=100)
-        if num_drives > 0:
-            axs = fig.subplots(num_drives, 1) if num_drives > 1 else [fig.add_subplot(111)]
-        else:
-            axs = [fig.add_subplot(111)]
-            axs[0].text(0.5, 0.5, "No drives found", ha='center')
-        for ax, (drive, (total, used, free)) in zip(axs, drives.items()):
-            used_pct = used / total * 100 if total > 0 else 0
-            free_pct = free / total * 100 if total > 0 else 0
-            ax.pie([used_pct, free_pct],
-                   labels=[f"Used ({used_pct:.1f}%)", f"Free ({free_pct:.1f}%)"],
-                   autopct="%1.1f%%", startangle=90)
-            ax.set_title(f"Drive {drive}")
-            stats_text = f"Total: {format_bytes(total)}\nUsed: {format_bytes(used)}\nFree: {format_bytes(free)}"
-            ax.text(0.5, -0.15, stats_text, transform=ax.transAxes, ha="center", va="top", fontsize=10)
-        fig.tight_layout()
-        canvas = FigureCanvasTkAgg(fig, master=self.storage_chart_frame)
-        canvas.draw()
-        canvas.get_tk_widget().pack(fill="both", expand=True)
+    def open_edit_podcast_dialog(self, podcast_name):
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Edit Podcast")
+        dialog.geometry("400x200+150+100")
+        dialog.resizable(False, False)
+        current_url = self.podcasts[podcast_name]['url']
+        current_output = self.podcasts[podcast_name]['output']
+        url_var = tk.StringVar(value=current_url)
+        output_var = tk.StringVar(value=current_output)
+        ttk.Label(dialog, text="RSS Feed URL:").pack(pady=2, padx=10, anchor="w")
+        ttk.Entry(dialog, textvariable=url_var, width=50).pack(pady=2, padx=10)
+        def choose_output():
+            path = filedialog.askdirectory(title="Select Output Directory")
+            if path:
+                output_var.set(path)
+        folder_frame = ttk.Frame(dialog)
+        folder_frame.pack(pady=2, padx=10, fill="x")
+        ttk.Label(folder_frame, text="Output Folder:").pack(side="left")
+        ttk.Entry(folder_frame, textvariable=output_var, width=35).pack(side="left", padx=3)
+        ttk.Button(folder_frame, text="Browse", command=choose_output).pack(side="left")
+        btn_frame = ttk.Frame(dialog)
+        btn_frame.pack(pady=10)
+        def on_ok():
+            u = url_var.get().strip()
+            o = output_var.get().strip()
+            if u and o:
+                self.config[podcast_name]['url'] = u
+                self.config[podcast_name]['output'] = o
+                self.podcasts[podcast_name] = {'url': u, 'output': o}
+                self.save_config()
+                self.refresh_list()
+            dialog.destroy()
+        ttk.Button(btn_frame, text="OK", command=on_ok).pack(side="left", padx=5)
+        ttk.Button(btn_frame, text="Cancel", command=dialog.destroy).pack(side="left", padx=5)
+        dialog.wait_window(dialog)
 
-    # ------------------ Podcasts Update ------------------
+    def add_podcast(self):
+        self.open_add_podcast_dialog()
+
+    def edit_podcast(self):
+        selected = [name for name, var in self.check_vars.items() if var.get()]
+        if len(selected) != 1:
+            messagebox.showinfo("Edit Podcast", "Select exactly one podcast to edit.")
+            return
+        self.open_edit_podcast_dialog(selected[0])
+
+    def remove_podcast(self):
+        selected = [name for name, var in self.check_vars.items() if var.get()]
+        if not selected:
+            messagebox.showinfo("Remove Podcast", "Select at least one podcast to remove.")
+            return
+        for name in selected:
+            self.config.remove_section(name)
+            del self.podcasts[name]
+        self.save_config()
+        self.refresh_list()
+
+    # ------------------ Podcasts Update & Others ------------------
     def update_selected(self):
         selected = [name for name, var in self.check_vars.items() if var.get()]
         if not selected:
@@ -625,7 +718,6 @@ class PodcastManagerApp:
         self.log("Update completed.")
         self.root.after(0, self.show_storage)
 
-    # ------------------ One-Off Download ------------------
     def download_one_off(self):
         dialog = tk.Toplevel(self.root)
         dialog.title("One-Off Download")
@@ -678,7 +770,6 @@ class PodcastManagerApp:
             except Exception as e:
                 self.root.after(0, lambda: messagebox.showinfo("Error", str(e)))
 
-    # ------------------ Stop and Switch User ------------------
     def set_stop_flag(self):
         self.stop_flag = True
         self.log("Stop flag set. Will stop after the current download completes.")
@@ -688,7 +779,6 @@ class PodcastManagerApp:
             self.switch_user_requested = True
             self.root.destroy()
 
-    # ------------------ Logging Helper ------------------
     def log(self, message):
         print(message)
         def update_ui():
@@ -698,7 +788,6 @@ class PodcastManagerApp:
                 self.log_text.see('end')
         self.root.after(0, update_ui)
 
-    # ------------------ Filtering Helper ------------------
     def filter_entries(self, entries, max_episodes, filter_date):
         filtered = []
         for entry in entries:
