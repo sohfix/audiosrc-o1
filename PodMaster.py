@@ -307,7 +307,8 @@ class PodcastManagerApp:
                 except Exception:
                     drives[drive] = (0, 0, 0)
 
-        fig = Figure(figsize=(8, 1.5 * len(drives)), dpi=100)
+        # Set a minimum height of 2 inches to prevent singular matrix error
+        fig = Figure(figsize=(8, max(1.5 * len(drives), 2)), dpi=100)
         ax = fig.add_subplot(111)
 
         drive_labels = []
@@ -415,7 +416,6 @@ class PodcastManagerApp:
     def set_volume(self, event=None):
         vol = int(self.volume_var.get())
         self.media_player.audio_set_volume(vol)
-        #self.log(f"Volume set to {vol}%.")
 
     # ------------------ Metrics Tab ------------------
     def build_metrics_tab(self, parent):
@@ -464,7 +464,6 @@ class PodcastManagerApp:
         controls_frame = ttk.Frame(frame)
         controls_frame.pack(pady=10)
 
-        # Larger and clearer Unicode symbols
         ttk.Button(controls_frame, text="⏪ 15s", width=8, command=self.skip_backward).grid(row=0, column=0, padx=5)
         ttk.Button(controls_frame, text="► Play", width=8, command=self.play_audio).grid(row=0, column=1, padx=5)
         ttk.Button(controls_frame, text="⏸ Pause", width=8, command=self.pause_audio).grid(row=0, column=2, padx=5)
@@ -588,7 +587,6 @@ class PodcastManagerApp:
 
         update_frame = ttk.Frame(parent)
         update_frame.pack(fill="x", padx=5, pady=5)
-        # We remove "Update All" and keep only "Update Selected"
         ttk.Button(update_frame, text="Update Selected", command=self.update_selected).pack(side="left", padx=3)
 
         list_frame = ttk.Frame(parent)
@@ -788,7 +786,7 @@ class PodcastManagerApp:
                 except Exception as e:
                     self.log(f"Error checking existing file: {filename}, proceeding to download. Error: {e}")
 
-            self.log(f"Downloading file for'{podcast_name}'...")
+            self.log(f"Downloading file for '{podcast_name}'...")
             try:
                 with requests.get(file_url, stream=True, timeout=10) as r:
                     r.raise_for_status()
