@@ -5,7 +5,7 @@ import shutil
 import configparser
 import logging
 import tkinter as tk
-from tkinter import messagebox, filedialog, ttk
+from tkinter import messagebox, ttk
 import datetime
 import threading
 import psutil  # dependency for system monitoring/cleanup
@@ -340,7 +340,7 @@ class RemoApp(tk.Tk):
 
         self.create_menubar()
         self.create_main_widgets()
-        self.log("REMO Cleaner with System Tools and Detailed Progress")
+        self.log("REMO Cleaner for pyinstaller files.")
 
     def load_icon(self):
         if os.path.exists(ICON_PATH):
@@ -355,7 +355,6 @@ class RemoApp(tk.Tk):
         file_menu.add_command(label="Exit", command=self.safe_exit)
         menubar.add_cascade(label="File", menu=file_menu)
         settings_menu = tk.Menu(menubar, tearoff=0)
-        settings_menu.add_command(label="Open Settings...", command=self.open_settings_window)
         settings_menu.add_command(label="Toggle Dark Mode", command=self.toggle_dark_mode)
         menubar.add_cascade(label="Settings", menu=settings_menu)
         help_menu = tk.Menu(menubar, tearoff=0)
@@ -417,7 +416,7 @@ class RemoApp(tk.Tk):
         logging.info(msg)
 
     def show_about(self):
-        messagebox.showinfo("About", "REMO Cleaner with System Tools and Detailed Progress")
+        messagebox.showinfo("About", "REMO Cleaner")
 
     def check_updates(self):
         messagebox.showinfo("Check Updates", "No updates available at this time.")
@@ -425,106 +424,6 @@ class RemoApp(tk.Tk):
     def safe_exit(self):
         self.destroy()
         self.quit()
-
-    def open_settings_window(self):
-        SettingsWindow(self, self.dark_mode)
-
-# -----------------------------------------
-#  Settings Window (Notebook with tabs)
-# -----------------------------------------
-class SettingsWindow(tk.Toplevel):
-    def __init__(self, parent, dark_mode):
-        super().__init__(parent)
-        self.parent = parent
-        self.dark_mode = dark_mode
-        self.title("Settings")
-        self.geometry("600x400")
-        self.configure(bg=parent["bg"])
-        self.notebook = ttk.Notebook(self)
-        self.notebook.pack(fill=tk.BOTH, expand=True)
-
-        # General Tab
-        self.tab_general = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_general, text="General")
-        self.build_general_tab()
-
-        # Folders Tab
-        self.tab_folders = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_folders, text="Folders")
-        self.build_folders_tab()
-
-        # System Cleaner Tab
-        self.tab_system = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_system, text="System Cleaner")
-        self.build_system_tab()
-
-        # Activity Monitor Tab
-        self.tab_monitor = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_monitor, text="Activity Monitor")
-        self.build_monitor_tab()
-
-    def build_general_tab(self):
-        frame = ttk.Frame(self.tab_general)
-        frame.pack(fill=tk.BOTH, expand=True, pady=10, padx=10)
-        self.dark_var = tk.BooleanVar(value=self.dark_mode)
-        dark_check = ttk.Checkbutton(frame, text="Use Dark Mode", variable=self.dark_var)
-        dark_check.pack(anchor="w", pady=5)
-        ttk.Button(frame, text="Save", command=self.save_general_settings).pack(side="right", padx=5, pady=5)
-
-    def save_general_settings(self):
-        config["Settings"]["dark_mode"] = "true" if self.dark_var.get() else "false"
-        save_config()
-        self.parent.dark_mode = self.dark_var.get()
-        self.parent.apply_dark_mode_style()
-        self.parent.log("General settings saved.")
-
-    def build_folders_tab(self):
-        frame = ttk.Frame(self.tab_folders)
-        frame.pack(fill=tk.BOTH, expand=True, pady=10, padx=10)
-        self.folder_listbox = tk.Listbox(frame, selectmode=tk.SINGLE, height=8)
-        self.folder_listbox.pack(fill=tk.BOTH, expand=True, side="left")
-        for d in get_tracked_folders():
-            self.folder_listbox.insert(tk.END, d)
-        btn_frame = ttk.Frame(frame)
-        btn_frame.pack(side="right", fill=tk.Y, padx=5)
-        ttk.Button(btn_frame, text="Add...", command=self.add_folder).pack(pady=2)
-        ttk.Button(btn_frame, text="Remove", command=self.remove_folder).pack(pady=2)
-        ttk.Button(btn_frame, text="Save", command=self.save_folder_list).pack(pady=(20,2))
-
-    def add_folder(self):
-        path = filedialog.askdirectory(title="Select Folder to Add")
-        if path:
-            self.folder_listbox.insert(tk.END, path)
-
-    def remove_folder(self):
-        sel = self.folder_listbox.curselection()
-        if sel:
-            self.folder_listbox.delete(sel[0])
-
-    def save_folder_list(self):
-        folders = [self.folder_listbox.get(i) for i in range(self.folder_listbox.size())]
-        set_tracked_folders(folders)
-        self.parent.log("Folder list updated.")
-        save_config()
-
-    def build_system_tab(self):
-        frame = ttk.Frame(self.tab_system)
-        frame.pack(fill=tk.BOTH, expand=True, pady=10, padx=10)
-        ttk.Button(frame, text="Clean System Cache", command=lambda: self.run_task(clean_system_cache)).pack(pady=5)
-        ttk.Button(frame, text="Clean External Drives", command=lambda: self.run_task(clean_external_drives)).pack(pady=5)
-        self.sys_log = tk.Text(frame, height=8, wrap="word")
-        self.sys_log.pack(fill=tk.BOTH, expand=True, pady=5)
-
-    def run_task(self, task_func):
-        def worker():
-            result, _ = task_func(lambda m, s: self.sys_log.insert(tk.END, m + "\n"))
-            self.sys_log.insert(tk.END, result + "\n")
-            self.sys_log.see(tk.END)
-        threading.Thread(target=worker, daemon=True).start()
-
-    def build_monitor_tab(self):
-        monitor = ActivityMonitor(self.tab_monitor)
-        monitor.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
 # -----------------------------------------
 #  Main Entry
