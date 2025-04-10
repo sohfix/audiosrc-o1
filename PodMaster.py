@@ -41,32 +41,24 @@ def format_bytes(num_bytes):
 
 
 class PodcastManagerApp:
-    def __init__(self, root, username):
+    def __init__(self, root, username="admin"):
         self.root = root
         self.username = username
-        self.root.title(f"Podcast Manager - User: {self.username}")
-        self.root.geometry("840x600")
+        self.root.title(f"Podcast Manager - fuck you")
+        self.root.geometry("840x550")
 
         self.stop_flag = False
         self.switch_user_requested = False
 
-        # For usage metrics file
-        self.metrics_file = os.path.join(
-            CONFIG_DIR, f"played_episodes_{self.username}.csv"
-        )
-        if not os.path.exists(self.metrics_file):
-            with open(self.metrics_file, "w", newline="") as f:
-                writer = csv.writer(f)
-                writer.writerow(["Title", "FilePath", "PlayedAt"])
 
         style = ttk.Style(self.root)
         try:
-            style.theme_use("clam")
+            style.theme_use("alt")
         except Exception:
             pass
 
         # Set user-specific podcasts config path
-        self.CONFIG_PATH = os.path.join(CONFIG_DIR, f"pods_{self.username}.ini")
+        self.CONFIG_PATH = os.path.join(CONFIG_DIR, f"pods_admin.ini")
         self.podcasts = {}
         self.check_vars = {}
 
@@ -519,7 +511,7 @@ class PodcastManagerApp:
             # The main checkbutton for this podcast
             chk = ttk.Checkbutton(
                 self.podcast_list_frame,
-                text=f"{name} | {data['url']} | {data['output']}",
+                text=f"{name} | {data['output']}",
                 variable=var,
             )
             chk.grid(row=idx, column=0, sticky="w", padx=2, pady=2)
@@ -843,11 +835,6 @@ class PodcastManagerApp:
     def set_stop_flag(self):
         self.stop_flag = True
         self.log("Stop flag set.")
-
-    def switch_user(self):
-        if messagebox.askyesno("Switch User", "Are you sure you want to switch user?"):
-            self.switch_user_requested = True
-            self.root.destroy()
 
     def log(self, message):
         print(message)
