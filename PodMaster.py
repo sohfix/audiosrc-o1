@@ -1,5 +1,4 @@
 import configparser
-import csv
 import datetime
 import io
 import os
@@ -25,7 +24,7 @@ GUI_THEME = "alt"
 # Constants for config file paths
 CONFIG_DIR = r"C:\tools\config"
 USERS_CONFIG_PATH = os.path.join(CONFIG_DIR, "users.ini")
-DEFAULT_TOLERANCE_MB = 7
+DEFAULT_TOLERANCE_MB = 15
 
 
 def format_bytes(num_bytes):
@@ -132,7 +131,7 @@ class PodcastManagerApp:
         self.file_progress_label.pack(side="left", padx=10)
 
         ttk.Button(
-            status_frame, text="Stop After Next", command=self.set_stop_flag
+            status_frame, text="Stop", command=self.set_stop_flag
         ).pack(side="left", padx=10)
 
         # NOTEBOOK FOR TABS:
@@ -445,7 +444,7 @@ class PodcastManagerApp:
             side="left", padx=3
         )
         ttk.Button(
-            top_frame, text="Download One-Off", command=self.download_one_off
+            top_frame, text="DL 1 RSS", command=self.download_one_off
         ).pack(side="left", padx=3)
 
         tol_frame = ttk.Frame(parent)
@@ -456,21 +455,6 @@ class PodcastManagerApp:
             side="left", padx=3
         )
 
-        filter_frame = ttk.Frame(parent)
-        filter_frame.pack(fill="x", padx=5, pady=5)
-        ttk.Label(filter_frame, text="Max Episodes:").pack(side="left")
-        self.max_episodes_var = tk.StringVar()
-        ttk.Entry(filter_frame, textvariable=self.max_episodes_var, width=5).pack(
-            side="left", padx=3
-        )
-
-        ttk.Label(filter_frame, text="Filter Date (YYYY-MM-DD):").pack(
-            side="left", padx=(10, 0)
-        )
-        self.filter_date_var = tk.StringVar()
-        ttk.Entry(filter_frame, textvariable=self.filter_date_var, width=12).pack(
-            side="left", padx=3
-        )
 
         update_frame = ttk.Frame(parent)
         update_frame.pack(fill="x", padx=5, pady=5)
@@ -674,29 +658,12 @@ class PodcastManagerApp:
         ).start()
 
     def update_podcasts(self, podcast_names):
-        try:
-            max_episodes = (
-                int(self.max_episodes_var.get())
-                if self.max_episodes_var.get().isdigit()
-                else None
-            )
-        except:
-            max_episodes = None
 
-        filter_date = None
-        if self.filter_date_var.get():
-            try:
-                filter_date = datetime.datetime.strptime(
-                    self.filter_date_var.get(), "%Y-%m-%d"
-                )
-            except:
-                self.log("Invalid filter date format. Ignoring date filter.")
-
-        tasks = []
+        max_episodes, tasks = None, []
         for name in podcast_names:
             url = self.podcasts[name]["url"]
             feed = feedparser.parse(url)
-            entries = self.filter_entries(feed.entries, max_episodes, filter_date)
+            entries = self.filter_entries(feed.entries, max_episodes, filter_date=None)
             for entry in entries:
                 if "enclosures" in entry:
                     for enc in entry.enclosures:
@@ -720,7 +687,7 @@ class PodcastManagerApp:
                 try:
                     existing_size = os.path.getsize(filepath)
                     if existing_size > 10 * 1024 * 1024:
-                        self.log(f"Skipping existing file over 10MB: {filename}")
+                        self.log(f"Skipping existing file over {DEFAULT_TOLERANCE_MB}MB: {filename}")
                         self.root.after(0, lambda: self.progress_bar.step(1))
                         if self.stop_flag:
                             self.log("Stopping after current download.")
@@ -764,7 +731,7 @@ class PodcastManagerApp:
 
     def download_one_off(self):
         dialog = tk.Toplevel(self.root)
-        dialog.title("One-Off Download")
+        dialog.title("DL 1 RSS")
         dialog.geometry("400x150+150+100")
         dialog.resizable(False, False)
 
